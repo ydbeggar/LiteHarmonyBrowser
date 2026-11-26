@@ -86,9 +86,14 @@ export default {
   applySource(cb) {
     var that = this;
     var done = false;
+    var timer = 0;
     function finish(value) {
       if (done) { return; }
       done = true;
+      if (timer) {
+        clearTimeout(timer);
+        timer = 0;
+      }
       var n = Math.floor(Number(value));
       if (isNaN(n) || n < 0 || n >= Rsscfg.sources.length) {
         n = Rsscfg.DEFAULT_INDEX;
@@ -97,6 +102,8 @@ export default {
       that.sourceName = Rsscfg.sources[n].name;
       if (typeof cb === 'function') { cb(); }
     }
+    /* storage 回调丢失时按默认源继续，不让页面停在空白列表。 */
+    timer = setTimeout(function () { finish(''); }, 800);
     try {
       storage.get({
         key: KEY_SOURCE,

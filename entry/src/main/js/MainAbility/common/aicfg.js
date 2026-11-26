@@ -15,15 +15,25 @@ var MAX_KEY_LEN = 120;
 
 function getValue(key, cb) {
   var done = false;
+  var timer = 0;
   function finish(value) {
     if (done) {
       return;
     }
     done = true;
+    if (timer) {
+      clearTimeout(timer);
+      timer = 0;
+    }
     if (typeof cb === 'function') {
       cb(value === null || value === undefined ? '' : String(value));
     }
   }
+  /* 部分 Lite 模拟器/旧固件 storage 回调可能丢失；800ms 后按未设置继续，
+     页面不会永远停在“正在读取配置”。 */
+  timer = setTimeout(function () {
+    finish('');
+  }, 800);
   try {
     storage.get({
       key: key,
