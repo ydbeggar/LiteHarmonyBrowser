@@ -1,0 +1,85 @@
+<stack class="root" style="width: {{g.w}}px; height: {{g.h}}px;" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <!-- API Key 设置 -->
+    <stack class="view" if="{{isSetup}}">
+        <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">增强搜索</text>
+            <div class="hdr-btn hdr-btn-flat"></div>
+        </div>
+
+        <stack class="setup" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+            <text class="setup-title">启用 DeepSeek 增强搜索</text>
+            <text class="setup-hint">搜索或抓取网页正文，需要手动填写 DeepSeek API Key；Key 只保存在手表本地，不会写入代码或上传。</text>
+            <input class="key-input" type="password" placeholder="粘贴 DeepSeek API Key" onchange="onKeyChange" />
+            <div class="btn primary setup-btn" onclick="onSaveKey">
+                <text class="btn-txt">保存并启用</text>
+            </div>
+            <text class="key-state">当前：{{keyMasked}}</text>
+            <text class="setup-error" show="{{isFailed}}">{{failTitle}} {{failSub}}</text>
+            <div class="link-row" onclick="onClearKey">
+                <text class="link-txt">清除已保存的 API Key</text>
+            </div>
+        </stack>
+    </stack>
+
+    <!-- 搜索/阅读 -->
+    <stack class="view" elif="{{isSearch}}">
+        <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">增强搜索</text>
+            <div class="hdr-btn hdr-btn-action" onclick="onClearKey">
+                <text class="hdr-action">设置</text>
+            </div>
+        </div>
+
+        <stack class="search" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+            <div class="bar" style="height: {{g.barH}}px;">
+                <input class="bar-input" type="text" placeholder="网址或关键词" onchange="onQueryChange" />
+                <div class="bar-btn" onclick="onReadUrl">
+                    <text class="bar-btn-txt">读网页</text>
+                </div>
+                <div class="bar-btn" onclick="onSearch">
+                    <text class="bar-btn-txt">搜索</text>
+                </div>
+            </div>
+
+            <stack class="area" style="top: {{g.areaY}}px; height: {{g.areaH}}px;">
+                <div class="state lwb-in" if="{{isLoading}}">
+                    <text class="state-title">{{loadingText}}</text>
+                    <text class="state-sub">已等待 {{waitText}}</text>
+                </div>
+
+                <list class="list" ref="aiList" id="aiList" rotationvibrate="true" if="{{hasResults}}" style="height: {{g.areaH}}px; opacity: {{fadeOpacity}};">
+                    <list-item class="spacer-item">
+                        <div class="spacer"></div>
+                    </list-item>
+                    <list-item class="item" style="height: {{g.itemH}}px;" for="{{(index, item) in items}}" tid="url">
+                        <stack class="item-inner" style="height: {{g.innerH}}px;" onclick="onOpen(index)">
+                            <text class="item-title">{{item.title}}</text>
+                            <text class="item-meta">{{item.siteName}} {{item.date}}</text>
+                            <text class="item-sum">{{item.snippet}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="tail-item">
+                        <div class="tail"></div>
+                    </list-item>
+                </list>
+
+                <div class="state lwb-in" elif="{{isFailed}}">
+                    <text class="state-title">{{failTitle}}</text>
+                    <text class="state-sub">{{failSub}}</text>
+                    <div class="state-btn" onclick="onRetry">
+                        <text class="state-btn-txt">返回</text>
+                    </div>
+                    <div class="state-btn state-btn-ghost" onclick="onFallbackRead">
+                        <text class="state-btn-txt">普通阅读打开</text>
+                    </div>
+                </div>
+            </stack>
+        </stack>
+    </stack>
+</stack>

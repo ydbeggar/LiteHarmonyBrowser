@@ -1,0 +1,97 @@
+<stack class="root rd-root" style="width: {{g.w}}px; height: {{g.h}}px;" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <!-- 列表视图 -->
+    <stack class="view" if="{{isList}}">
+        <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">{{headerTitle}}</text>
+            <div class="hdr-btn hdr-btn-action" onclick="onRefresh">
+                <text class="hdr-action">刷新</text>
+            </div>
+        </div>
+
+        <div class="source-bar" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.channelH}}px;" onclick="onOpenChannel">
+            <text class="source-name">{{sourceName}}</text>
+            <text class="source-arrow">切换 ›</text>
+        </div>
+
+        <stack class="area" style="left: {{g.listX}}px; top: {{g.feedY}}px; height: {{g.feedH}}px;">
+            <div class="state lwb-in" if="{{isLoading}}">
+                <text class="state-title">正在获取 RSS…</text>
+                <text class="state-sub">{{sourceName}}</text>
+            </div>
+
+            <list class="list" ref="feedList" id="feedList" rotationvibrate="true" if="{{hasItems}}" style="height: {{g.feedH}}px; opacity: {{fadeOpacity}};">
+                <list-item class="spacer-item">
+                    <div class="spacer"></div>
+                </list-item>
+                <list-item class="item" style="height: {{g.itemH}}px;" for="{{(index, item) in items}}" tid="url">
+                    <stack class="item-inner" style="height: {{g.innerH}}px;" onclick="onOpen(index)">
+                        <text class="item-title">{{item.title}}</text>
+                        <text class="item-meta">{{item.meta}}</text>
+                        <text class="item-sum">{{item.summary}}</text>
+                    </stack>
+                </list-item>
+                <list-item class="tail-item">
+                    <div class="tail"></div>
+                </list-item>
+            </list>
+
+            <div class="state lwb-in" elif="{{isFailed}}">
+                <text class="state-title">{{failTitle}}</text>
+                <text class="state-sub">{{failSub}}</text>
+            </div>
+        </stack>
+    </stack>
+
+    <!-- 频道选择 -->
+    <stack class="view" elif="{{isChannels}}">
+        <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">选择频道</text>
+            <div class="hdr-btn hdr-btn-flat"></div>
+        </div>
+
+        <list class="channel-list" ref="channelList" id="channelList" rotationvibrate="true" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+            <list-item class="channel-item" style="height: 64px;" for="{{(index, src) in sourceList}}">
+                <stack class="channel-inner" style="height: 60px;" onclick="onPickChannel(index)">
+                    <text class="channel-name">{{src.name}}</text>
+                    <text class="channel-arrow">›</text>
+                </stack>
+            </list-item>
+        </list>
+    </stack>
+
+    <!-- 详情 -->
+    <stack class="view" elif="{{isDetail}}">
+        <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">新闻详情</text>
+            <div class="hdr-btn hdr-btn-flat"></div>
+        </div>
+
+        <stack class="detail" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+            <text class="d-title" style="height: {{g.detailTitleH}}px;">{{current.title}}</text>
+            <text class="d-meta" style="top: {{g.detailTitleH}}px; height: {{g.detailMetaH}}px;">{{current.meta}}</text>
+            <list class="d-body" ref="detailList" id="detailList" rotationvibrate="true" style="top: {{g.detailBodyY}}px; height: {{g.detailBodyH}}px;">
+                <list-item class="d-para-item" for="{{(index, p) in paragraphs}}" style="height: {{p.h}}px;">
+                    <text class="d-para" style="height: {{p.h}}px;">{{p.text}}</text>
+                </list-item>
+            </list>
+            <div class="d-foot" style="top: {{g.detailBtnY}}px; height: {{g.detailBtnH}}px;">
+                <div class="btn primary" style="height: {{g.detailBtnH}}px;" onclick="onReadOriginal">
+                    <text class="btn-txt">阅读原文</text>
+                </div>
+            </div>
+        </stack>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+</stack>
+

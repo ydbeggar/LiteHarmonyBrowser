@@ -144,10 +144,14 @@ function parseList(raw) {
   return out;
 }
 
-/** 读取清单。cb(items)，必回调。 */
+/** 读取清单。cb(items, ok)，必回调；301=清单不存在按空清单，其他读错误 ok=false。 */
 function list(cb) {
-  readSmall(LIST_URI, function (raw) {
-    cb(parseList(raw));
+  readSmall(LIST_URI, function (raw, ok, code) {
+    if (!ok && String(code) !== '301') {
+      cb([], false);
+      return;
+    }
+    cb(parseList(raw), true);
   });
 }
 
@@ -178,14 +182,14 @@ function save(entry, text, onProgress, cb) {
   if (src.length > SAVE_CAP) {
     src = src.substring(0, SAVE_CAP) + TRUNC_MARK;
   }
-  var partCount = Math.ceil(src.length / PART_CHARS);
-  if (!(partCount >= 1)) {
+  /* 按字符 + UTF-8 字节双重上限切片；旧实现按 1200 字符切，
+     1200 个 4 字节字符会超过 readText 的 4000B 上限并报 302。 */
+  var parts = Fs.splitText(src, PART_CHARS, MAX_PARTS);
+  if (parts.length < 1) {
     /* 空正文也写一个空片，保证 load 能区分「存在但为空」与「缺失」 */
-    partCount = 1;
+    parts = [''];
   }
-  if (partCount > MAX_PARTS) {
-    partCount = MAX_PARTS;
-  }
+  var partCount = parts.length;
   if (!entry || !entry.url) {
     done(false);
     return;
@@ -219,7 +223,11 @@ function save(entry, text, onProgress, cb) {
 
   function runSave() {
     try {
-      list(function (items) {
+      list(function (items, listOk) {
+        if (!listOk) {
+          done(false);
+          return;
+        }
         try {
           var next = [meta];
           var dropped = [];
@@ -242,13 +250,7 @@ function save(entry, text, onProgress, cb) {
             finishSave();
             return;
           }
-          var piece = '';
-          try {
-            piece = src.substr(index * PART_CHARS, PART_CHARS);
-          } catch (err3) {
-            done(false);
-            return;
-          }
+          var piece = parts[index] || '';
           writeSmall(contentUri(key, index), piece, function (ok) {
             if (!ok) {
               done(false);
@@ -321,17 +323,29 @@ function load(key, parts, cb) {
 function remove(key, parts, cb) {
   var done = once(cb);
   var count = clampParts(parts);
-  for (var i = 0; i < count; i += 1) {
-    deleteQuietly(contentUri(key, i));
-  }
-  list(function (items) {
+  list(function (items, listOk) {
+    if (!listOk) {
+      done(false);
+      return;
+    }
     var next = [];
     for (var j = 0; j < items.length; j += 1) {
       if (items[j].key !== String(key)) {
         next.push(items[j]);
       }
     }
-    writeList(next, function (ok) { done(ok); });
+    /* 先写清单、后删正文：清单写失败时旧条目仍可打开；
+       最多留下无引用的分片文件，由“清除本地文件”回收。 */
+    writeList(next, function (ok) {
+      if (!ok) {
+        done(false);
+        return;
+      }
+      for (var i = 0; i < count; i += 1) {
+        deleteQuietly(contentUri(key, i));
+      }
+      done(true);
+    });
   });
 }
 

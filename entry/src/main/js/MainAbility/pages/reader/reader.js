@@ -18,6 +18,7 @@ import Crown from '../../common/crown.js';
 import Sway from '../../common/sway.js';
 import PageStore from '../../common/pagestore.js';
 import Sched from '../../common/scheduler.js';
+import Aistore from '../../common/aistore.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var TXT_SAVE = '收藏';
@@ -38,7 +39,8 @@ var FAIL_TEXT = {
   unsupported: ['暂不支持该类型内容', '该地址返回的内容无法解析为可读正文'],
   toolarge: ['页面内容过大', '该页面超出手表处理能力，请换更轻量的站点'],
   toc: ['无法打开整本目录', '目录页数百 KB 超出内存，请用阅读页「目录」按钮浏览章节'],
-  'offline-miss': ['离线内容已失效', '请返回离线列表并重新保存该网页']
+  'offline-miss': ['离线内容已失效', '请返回离线列表并重新保存该网页'],
+  'ai-miss': ['AI 正文已失效', '请返回增强搜索重新抓取该网页']
 };
 
 function toast(message) {
@@ -217,6 +219,14 @@ export default {
   },
 
   applyTarget(params) {
+    if (params && params.aiKey) {
+      this.openAiText(
+        String(params.url || ''),
+        String(params.title || ''),
+        Number(params.aiTruncated) === 1
+      );
+      return;
+    }
     if (params && params.offline) {
       this.openOffline(
         params.key ? String(params.key) : '',
@@ -419,7 +429,7 @@ export default {
        v1.1.1：受限设备（圆屏 / API<24）不落盘、不读盘，避免文件服务大面积崩溃；
        强开完整模式（forceFull）可覆盖。 */
     this.isDisk = false;
-    if (this.isFullMode() && doc.text && doc.text.length > 2000 && this.starts && this.starts.length > 1) {
+    if (!doc.ai && this.isFullMode() && doc.text && doc.text.length > 2000 && this.starts && this.starts.length > 1) {
       var saveUrl = doc.url;
       var saveText = doc.text;
       var saveStarts = this.starts;
@@ -863,6 +873,50 @@ export default {
     this.saveTrackBg = trackBg;
     /* 轨道宽 240px（v2.5 胶囊内进度条），满值 = 整条 */
     this.saveBarW = Math.floor(240 * (pct > 100 ? 100 : pct) / 100);
+  },
+
+  /* 打开 AI 抓取的纯文本：正文来自 internal://app/ai/ 分片，不走网络与 HTML 解析 */
+  openAiText(url, title, truncated) {
+    var that = this;
+    this.url = url || '';
+    this.title = title || 'AI 阅读';
+    this.loadingUrl = 'AI 正文';
+    this.pageText = '';
+    this.pageLabel = '';
+    this.isLoading = true;
+    this.isOk = false;
+    this.isEmpty = false;
+    this.isFailed = false;
+    this.startSpinner();
+    this.startLoadMeter();
+    Aistore.load(url, function (text) {
+      that.stopSpinner();
+      that.stopLoadMeter();
+      if (!text || text.length < Config.MIN_TEXT_CHARS) {
+        that.onFail('ai-miss');
+        return;
+      }
+      var doc = {
+        url: that.url,
+        title: that.title,
+        text: text,
+        links: [],
+        nextHref: '',
+        prevHref: '',
+        startHref: '',
+        chapters: [],
+        truncated: !!truncated,
+        kind: 'text',
+        ai: true,
+        status: 'ok',
+        failReason: '',
+        fetchedAt: Date.now()
+      };
+      that.install(doc, 0, 0);
+      if (truncated) {
+        toast('网页较长，已截断显示');
+      }
+    });
   },
 
   /* 打开离线网页：正文直接来自本地分片文件，不走网络与 HTML 解析 */

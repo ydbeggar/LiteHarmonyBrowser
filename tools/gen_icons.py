@@ -223,6 +223,54 @@ def shader():
     print('wrote %s (%d bytes)' % (path, os.path.getsize(path)))
 
 
+def ic_novel():
+    """小说搜索：打开的书 + 右上角四角星点（区别于书签的闭合书本）。"""
+    img, d = canvas()
+    # 左右两页：外轮廓 + 书脊
+    d.polygon([sc(14, 24), sc(38, 19), sc(38, 62), sc(14, 67)],
+              outline=W, width=int(5 * S))
+    d.polygon([sc(42, 19), sc(66, 24), sc(66, 67), sc(42, 62)],
+              outline=W, width=int(5 * S))
+    line(d, 40, 19, 40, 63, 5, cap=False)
+    # 右侧书页上的星点，暗示“找小说/推荐”
+    cx, cy, r1, r2 = 58.0, 26.0, 9.0, 3.0
+    pts = []
+    for i in range(8):
+        r = r1 if i % 2 == 0 else r2
+        a = math.radians(-90 + i * 45)
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    d.polygon([sc(x, y) for x, y in pts], fill=W)
+    save(img, 'ic_novel.png')
+
+
+def ic_ai():
+    """增强搜索：四角星 + 小页面轮廓，表示 AI 阅读。"""
+    img, d = canvas()
+    rrect(d, 14, 12, 54, 68, 5, 4)
+    line(d, 22, 26, 40, 26, 4)
+    line(d, 22, 38, 36, 38, 4)
+    # 右下角四角星
+    cx, cy, r1, r2 = 58.0, 56.0, 16.0, 5.0
+    pts = []
+    for i in range(8):
+        r = r1 if i % 2 == 0 else r2
+        a = math.radians(-90 + i * 45)
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    d.polygon([sc(x, y) for x, y in pts], fill=W)
+    save(img, 'ic_ai.png')
+
+
+def ic_rss():
+    """RSS：圆点 + 三道广播弧（经典 RSS 符号）。"""
+    img, d = canvas()
+    dot(d, 23, 57, 5)
+    # 以左下角为圆心的三段 90° 弧
+    for radius, width in ((16, 5), (28, 5), (40, 5)):
+        box = sc(23 - radius, 57 - radius, 23 + radius, 57 + radius)
+        d.arc(box, start=270, end=360, fill=W, width=int(width * S))
+    save(img, 'ic_rss.png')
+
+
 def shader_top():
     """顶部「高斯模糊式」渐变贴图（v2.9，底部 shader 的镜像朝向）。
 
@@ -247,6 +295,9 @@ if __name__ == '__main__':
     os.makedirs(OUT_DIR, exist_ok=True)
     ic_search()
     ic_book()
+    ic_novel()
+    ic_ai()
+    ic_rss()
     ic_clock()
     ic_doc()
     ic_target()
@@ -258,4 +309,4 @@ if __name__ == '__main__':
     star_full()
     shader()
     shader_top()
-    print('done: 13 assets -> %s' % OUT_DIR)
+    print('done: 16 assets -> %s' % OUT_DIR)

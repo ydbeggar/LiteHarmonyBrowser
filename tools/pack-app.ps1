@@ -26,7 +26,9 @@ param(
   [string]$CompileSdkVersion = "6.1.1.125",
   [string]$MainAbility = ".MainAbility",
   # 固定条目时间戳，让同样的输入产出同样的字节（便于记录 SHA256 做回归比对）
-  [string]$Timestamp = "2026-01-01T00:00:00+08:00"
+  [string]$Timestamp = "2026-01-01T00:00:00+08:00",
+  # v1.1.2：默认移除页面 PNG，只保留 DevEco 生成的 .png.bin（BIN-only 产物）
+  [switch]$KeepAppIcon
 )
 
 $ErrorActionPreference = "Stop"
@@ -121,6 +123,45 @@ foreach ($module in @($packInfo.summary.modules)) {
 $packJson = $packInfo | ConvertTo-Json -Depth 30 -Compress
 $entries["pack.info"] = Get-Utf8Bytes $packJson
 
+# v1.1.2 BIN-only：应用图标也改为 .bin。
+# resources.index 里的路径必须从 icon.png 改为 icon.bin（等长替换，不破坏二进制结构），
+# 同时把 icon.png.bin 复制成 icon.bin 供资源索引查找。
+function Replace-AsciiEqualLength {
+  param([byte[]]$Data, [string]$From, [string]$To)
+  $fromBytes = [System.Text.Encoding]::ASCII.GetBytes($From)
+  $toBytes = [System.Text.Encoding]::ASCII.GetBytes($To)
+  if ($fromBytes.Length -ne $toBytes.Length) { throw "索引路径替换长度不一致：$From -> $To" }
+  for ($i = 0; $i -le $Data.Length - $fromBytes.Length; $i++) {
+    $match = $true
+    for ($j = 0; $j -lt $fromBytes.Length; $j++) {
+      if ($Data[$i + $j] -ne $fromBytes[$j]) { $match = $false; break }
+    }
+    if ($match) {
+      for ($j = 0; $j -lt $toBytes.Length; $j++) { $Data[$i + $j] = $toBytes[$j] }
+      $i += $fromBytes.Length - 1
+    }
+  }
+  return $Data
+}
+
+$iconPairs = @(
+  @{ Png = 'assets/entry/resources/base/media/icon.png'; Bin = 'assets/entry/resources/base/media/icon.bin'; Old = 'entry/resources/base/media/icon.png'; New = 'entry/resources/base/media/icon.bin' },
+  @{ Png = 'assets/entry/resources/base/media/icon_small.png'; Bin = 'assets/entry/resources/base/media/icon_small.bin'; Old = 'entry/resources/base/media/icon_small.png'; New = 'entry/resources/base/media/icon_small.bin' }
+)
+$patchedIcons = 0
+$indexBytes = $entries['assets/entry/resources.index']
+if ($null -ne $indexBytes) {
+  foreach ($pair in $iconPairs) {
+    if ($entries.ContainsKey($pair.Png) -and $entries.ContainsKey($pair.Png + '.bin')) {
+      $entries[$pair.Bin] = $entries[$pair.Png + '.bin']
+      if (-not $order.Contains($pair.Bin)) { $order.Add($pair.Bin) }
+      $indexBytes = Replace-AsciiEqualLength -Data $indexBytes -From $pair.Old -To $pair.New
+      $patchedIcons += 1
+    }
+  }
+  $entries['assets/entry/resources.index'] = $indexBytes
+}
+
 $versionName = $config.app.version.name
 $versionCode = $config.app.version.code
 $baseName = "LiteHarmonyBrowser-v$versionName-unsigned-final"
@@ -129,12 +170,25 @@ $baseName = "LiteHarmonyBrowser-v$versionName-unsigned-final"
 $hapOut = Join-Path $outPath "$baseName.hap"
 if (Test-Path $hapOut) { Remove-Item $hapOut -Force }
 $outZip = [System.IO.Compression.ZipFile]::Open($hapOut, [System.IO.Compression.ZipArchiveMode]::Create)
+$written = 0
+$droppedPng = 0
 try {
   foreach ($name in $order) {
+    $isImage = $name -match '\.(png|jpg|jpeg|bmp)$'
+    $isAppIcon = $name -match '^assets/entry/resources/base/media/icon'
+    if ($isImage -and -not ($KeepAppIcon -and $isAppIcon)) {
+      $binName = $name + '.bin'
+      if (-not $entries.ContainsKey($binName)) {
+        throw "BIN-only 打包失败：$name 没有对应的 $binName"
+      }
+      $droppedPng += 1
+      continue
+    }
     $entry = $outZip.CreateEntry($name, [System.IO.Compression.CompressionLevel]::Optimal)
     $entry.LastWriteTime = $fixedTime
     $stream = $entry.Open()
     try { $stream.Write($entries[$name], 0, $entries[$name].Length) } finally { $stream.Dispose() }
+    $written += 1
   }
 } finally {
   $outZip.Dispose()
@@ -172,7 +226,8 @@ Write-Host ""
 Write-Host "版本        : $versionName ($versionCode)"
 Write-Host "config.json : compileSdkType=$CompileSdkType compileSdkVersion=$CompileSdkVersion mainAbility=$MainAbility package=$($config.app.bundleName) abilities=$abilityCount"
 Write-Host "pack.info   : 移除 modules[].apiVersion 共 $apiDrop 处"
-Write-Host "hap 条目数  : $($order.Count)"
+Write-Host "BIN-only    : 移除页面 PNG $droppedPng 个（保留 .png.bin）"
+Write-Host "hap 条目数  : $written"
 Write-Host ""
 Write-Host ("hap : {0}  ({1:N0} B)" -f $hapOut, $hapInfo.Length)
 Write-Host ("      SHA256 {0}" -f $hapHash)

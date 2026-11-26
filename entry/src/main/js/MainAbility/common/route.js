@@ -201,12 +201,21 @@ function setCurrent(url) {
     }
     return;
   }
-  try {
-    storage.set({ key: KEY_CURRENT, value: '' });
-  } catch (err3) {
-    /* ignore */
-  }
-  Fs.writeSmall(CURRENT_FILE, text, function () {});
+  /* 先写文件，成功后再清 storage：文件写失败时保留旧值，至少还能恢复
+     上一页；失败同时清 lastCurrent，下次同 URL 还会重试。 */
+  Fs.writeSmall(CURRENT_FILE, text, function (ok) {
+    if (!ok) {
+      if (lastCurrent === text) {
+        lastCurrent = null;
+      }
+      return;
+    }
+    try {
+      storage.set({ key: KEY_CURRENT, value: '' });
+    } catch (err3) {
+      /* ignore */
+    }
+  });
 }
 
 /** 读取"当前正在阅读的网址"：globalThis → storage（短 URL 主存）→ 文件

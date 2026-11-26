@@ -1,8 +1,8 @@
 # 交接说明（新会话从这里开始）
 
-> 本文件记录开发主线状态，**最后更新 2026-11-26**；最新变更见「五之四十」，当前主版本 **v1.1.1（1101）**（P2 流式解析 + P3 章文件分页 + 小说搜索 + GT 受限档回退；v1.0.4/1.0.5 已弃用）。
+> 本文件记录开发主线状态，**最后更新 2026-11-26**；当前主版本 **v1.1.2（1102）**（v1.1.1 基础上新增 DeepSeek 增强搜索、RSS 新闻、BIN-only 产物与文件 API 加固；v1.0.4/1.0.5 已弃用）。
 > 2026-11-26 恢复档案（会话丢失后重建，含完整证据索引）：`内部恢复档案（不随仓库发布）`。
-> 2026-11-26 已初始化本地 Git 仓库（`main`，tag `v1.1.1`）；`dist/` 纳入版本库，`entry/build/`、`.hvigor/` 与含证书的 `build-profile.json5` 不入库。
+> 2026-11-26 已初始化本地 Git 仓库（`main`，tag `v1.1.1`）；当前开发分支 `feat/v1.1.2`；`dist/` 纳入版本库，`entry/build/`、`.hvigor/` 与含证书的 `build-profile.json5` 不入库。
 > 结论分两类并明确标注：**真机实测**（WATCH FIT 5 Pro）与**本机构建/脚本验证**。
 > 未经真机复验的新改动会单独标「待真机确认」。
 
@@ -13,15 +13,15 @@
 | 工程 | `<repo>` |
 | bundleName | `com.example.litewearbrowser` |
 | 应用名 | **轻鸿浏览器**（`AppScope/res/element/string.json` 与 `entry/.../element/string.json` 两处；图标为 2026-11-04 新换的 92×92 蓝底书本图，三处 media 均已替换） |
-| 版本 | **versionCode 1101 / versionName 1.1.1**（关于页 `Release V1.1.1`；P2/P3 + 小说搜索 + GT 受限档回退；v1.0.4/1.0.5 已弃用） |
+| 版本 | **versionCode 1102 / versionName 1.1.2**（关于页 `Release V1.1.2`；v1.1.1 + DeepSeek 增强搜索 + RSS 新闻 + BIN-only） |
 | 目标设备 | HUAWEI WATCH FIT 5 Pro **408×480 方屏** + HUAWEI WATCH GT 系列 **466×466 圆屏**（圆屏走 `pages/round/*`；发布页标注兼容 GT7/GT6/FIT4/GTR2/FIT5） |
-| 页面 | 方屏 7 个业务页 + 首页；圆屏独立页 7 个（reader/search/links/shelf/settings/offline/novel；首页在 index 内分支） |
-| 公共模块 | `common/`：config / layout / searchcfg / txt / navrule / url / html / paginate / pagesink / pagestore / scheduler / paging / gesture / fade / crown / sway / fsutil / store / session / route / net / search / saved / space / linkpass / screen |
-| 本地存储 | `@system.file` 单文件数据集（store v3.4：bm/hs/pf.txt，3900B 自截断）；`fsutil` 全局 FIFO 串行 + 16ms 调用间隔；离线正文 `saved.js`（片 ≤1200 字、单次保存 ≤6 次调用）；P3 章文件 `internal://app/read/<key>.txt/.idx`（仅完整档）；网页缓存已删除（v3.3） |
+| 页面 | 方屏 9 个业务页 + 首页；圆屏独立页 9 个（reader/search/links/shelf/settings/offline/novel/ai/rss；首页在 index 内分支） |
+| 公共模块 | `common/`：config / layout / searchcfg / txt / navrule / url / html / paginate / pagesink / pagestore / scheduler / paging / gesture / fade / crown / sway / fsutil / store / session / route / net / search / saved / space / linkpass / screen / rss / rsscfg / md / aicfg / aiclient / aistore |
+| 本地存储 | `@system.file` 单文件数据集（store v3.4：bm/hs/pf.txt，3900B 自截断）；`fsutil` 全局 FIFO 串行 + 16ms 调用间隔；离线正文 `saved.js`（UTF-8 字节双层分片、单次保存 ≤6 次调用）；P3 章文件 `internal://app/read/<key>.txt/.idx`（仅完整档）；AI 正文 `internal://app/ai/` 分片（空终止片，首写不再清理 24 个旧片）；API Key 用 `@system.storage` 持久化；网页缓存已删除（v3.3） |
 | 小说站导航 | `common/navrule.js` + `html.js` 提取 `startHref`（「开始阅读」类）与 `chapters`（「第x章」类，≤40 条、章节优先）；reader 书名/目录页给「开始阅读 ›」「目录」直达控件；「上一章/下一章」走原有 NEXT/PREV 词表；links 页章节置顶 |
-| 构建产物 | `dist/unsigned/LiteHarmonyBrowser-v1.1.1-unsigned-final.hap`（67 条目）与同名 `.app`（3 条目） |
-| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.1-unsigned-final.hap`（482,932 B）与同名 `.app`（468,480 B）；交付说明见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.1\交付说明.md`；桌面同步放 `.app` |
-| SHA256 | hap `885B66FB2B3FDC4BA2620E14C7A0D2814E5ED7BFEC466D19350CD0A5126CC75F`<br>app `71EDC3F52FDCBE64E3210E2B9EB74EF7CD3A738CBB0015B39C67E7F12F7E5222` |
+| 构建产物 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（60 条目，0 PNG）与同名 `.app`（3 条目） |
+| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（563,017 B）与同名 `.app`（551,441 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
+| SHA256 | hap `9D0E3C75915563603EB4CD9B5AC2139CE784A342A3BCC3F1E577995319D4B454`<br>app `88ECA553683B9EC39583D666651FC9A92CA490B1FAE84EABAA9598CC685A901B` |
 | 签名 | `build-profile.json5` 已配置手动签名 `signingConfigs`（fit5pro.p12 / .cer / .p7b，SHA256withECDSA），**未绑定 product**，命令行只出未签名包；真机安装须用 **bin 格式 HAP**（见五之三十七） |
 | 档位 | compile `26.0.0` / target `5.0.0(12)` / compatible `4.0.0(10)` / minPlatformVersion 10 |
 
@@ -610,6 +610,36 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 7. **验证**：`node tools/smoke.js` 133/133；2026-11-09 12:06:07、12:08:01 两次 BUILD SUCCESSFUL；HAP 67 条目 / APP 3 条目。`reader.bc`、`round/reader.bc`、`search.bc`、`round/search.bc` 缺失（jerry-snapshot 64KB 堆限制），功能正常、冷启动慢 0.5~1s。
 8. **已知缺口**：`scheduler.memoryGate/degrade` 与优先级队列只在 `smoke.js` 单测中使用，未接入 reader 主链路；P3 只服务完整档；`forceFull` 在弱设备上可能复现 1.1.0 崩溃；GT7/GT6/FIT4/GTR2 本机无真机，1.1.1 修复依据为发布说明与代码逻辑，仍需社区回归。
 9. **1.0.8 P2/P3 真机待验清单**：`轻鸿蒙开发\交付-真机待验清单-v1.0.8-P2P3.md`（22 项 + P0 探针 5 项），当前仍建议逐项补测。
+
+## 五之四十一、v1.1.2：增强搜索 / RSS / BIN-only（2026-11-26）
+
+### 1. 功能
+
+- **增强搜索**：首页第 3 项「增强搜索」→ 首次进入设置 DeepSeek API Key（`@system.storage`，key `lwb_ai_key` / `lwb_ai_on`，单值 <128B）→ 输入关键词走 `POST /v1/tools/search`（8 条结果）或输入 `http(s)://` 走 `POST /v1/tools/fetch`（Markdown 正文）→ `common/md.js` 转纯文本 → `common/aistore.js` 分片落盘 → `reader` 本地纯文本阅读。Key 不写源码、不进日志、不进 Git；设置页可清除。
+- **RSS 新闻**：首页第 4 项「RSS 新闻」→ 5 个公共源（少数派/Solidot/InfoQ/博客园/开源中国）→ 列表/频道/详情三视图；RSS 2.0 + Atom 解析在 `common/rss.js`，源配置在 `common/rsscfg.js`；频道索引用 storage `lwb_rss_src` 持久化；详情可跳阅读页看原文。
+- **新图标**：`ic_novel.png`（书本+星）、`ic_ai.png`（页面+四角星）、`ic_rss.png`（点+三段弧）；小说搜索不再复用书签图标。
+- **BIN-only**：`pack-app.ps1` 默认删除所有 `.png/.jpg/.jpeg/.bmp` 条目，只保留 DevEco 生成的 `.png.bin`；应用图标 `icon.png/icon_small.png` 也改为 `icon.bin/icon_small.bin`，并等长改写 `resources.index` 路径。
+- **文件 API 加固**：`fsutil.splitText` UTF-8 3600B 双层分片、`readSmall` 返回 `ok/code`、store 迁移“写成功再删旧”、saved 清单读失败不覆盖、AI 空终止片、`ensureDir` 错误码、`route.setCurrent` 长 URL 写成功再清 storage。详见 `docs/FILE-API-REVIEW-v1.1.2.md`。
+
+### 2. 页面与配置
+
+- `entry/src/main/config.json` 页面数 19：方屏 `index + reader/links/shelf/settings/search/offline/novel/ai/rss`，圆屏 `round/reader...round/rss`。
+- `pages/round/ai/ai.js` 与 `pages/round/rss/rss.js` 只 re-export 方屏业务 JS；方/圆 CSS 各自独立，几何在 `common/layout.js` 的 `ai/rss` 段。
+- 版本三处：`AppScope/app.json5`、`config.json`、`index.js` 的 `APP_VERSION = 'Release V1.1.2'`；`tools/smoke.js` 的 `[version consistency]` 自动校验。
+
+### 3. 构建与产物
+
+- `pwsh -File tools/build.ps1`：冒烟（146 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
+- 当前未签名产物（2026-11-26 17:23 构建）：
+  - HAP `563,017 B`，60 条目，0 PNG，SHA256 `9D0E3C75915563603EB4CD9B5AC2139CE784A342A3BCC3F1E577995319D4B454`；
+  - APP `551,441 B`，SHA256 `88ECA553683B9EC39583D666651FC9A92CA490B1FAE84EABAA9598CC685A901B`。
+- 构建时 `index.js`、`reader.js`、`ai.js`、`search.js`、`rss.js` 等页面快照可能缺失（jerry-snapshot 64KB 堆），运行会退回解析 `.js`，功能不受影响；页面 JS 均 <112KB。
+
+### 4. 验证边界
+
+- 已执行：146/146 冒烟、release 构建、HAP 0 PNG/双端页面/JS 体积检查、RSS 真实源 PC 解析（5 源均出条目）、DeepSeek Search/Fetch 直连实测。
+- 未执行：FIT 5 Pro / GT 真机上的 API Key 持久化、AI 两端布局与超时、RSS 5 源手表网络、文件 API 字节语义、应用图标 `.bin` 启动器兼容性；手动 Lite Simulator 卡在 `current state(2) invalid`，只能验证 init 渲染，不能作为文件 API 证据。
+- 发布前必须补：签名 HAP 真机安装、首次/二次启动、Key 清除重填、AI 超时/402/429、RSS 源逐项、`internal://app/` 写入/读取/迁移、图片释放。
 
 ## 六、待办（按优先级）
 

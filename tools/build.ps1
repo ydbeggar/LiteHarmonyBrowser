@@ -41,6 +41,10 @@ if (-not $SkipPack) {
   Write-Host "==> tools/pack-app.ps1" -ForegroundColor Cyan
   & pwsh -NoProfile -File (Join-Path $root "tools\pack-app.ps1")
   if ($LASTEXITCODE -ne 0) { throw "打包失败（退出码 $LASTEXITCODE）" }
+
+  Write-Host "==> tools/verify-build.ps1" -ForegroundColor Cyan
+  & pwsh -NoProfile -File (Join-Path $root "tools\verify-build.ps1")
+  if ($LASTEXITCODE -ne 0) { throw "构建检查失败（退出码 $LASTEXITCODE）" }
 }
 
 Write-Host ""

@@ -12,7 +12,7 @@ var SEARCH_PAGE = 'pages/search/search';
 var OFFLINE_PAGE = 'pages/offline/offline';
 /* 关于页显示的版本号：与 AppScope/app.json5、entry/src/main/config.json 同步
    （smoke.js 有三处一致性用例，改动版本号时三处一起改） */
-var APP_VERSION = 'Release V1.1.1';
+var APP_VERSION = 'Release V1.1.2';
 
 export default {
   data: {
@@ -23,7 +23,9 @@ export default {
     appVersion: APP_VERSION,
     menu: [
       { key: 'search', name: '搜索网页', icon: '/common/ic_search.png' },
-      { key: 'novel', name: '搜索小说', icon: '/common/ic_book.png' },
+      { key: 'novel', name: '搜索小说', icon: '/common/ic_novel.png' },
+      { key: 'ai', name: '增强搜索', icon: '/common/ic_ai.png' },
+      { key: 'rss', name: 'RSS 新闻', icon: '/common/ic_rss.png' },
       { key: 'bookmark', name: '我的书签', icon: '/common/ic_book.png' },
       { key: 'history', name: '浏览历史', icon: '/common/ic_clock.png' },
       { key: 'offline', name: '离线网页', icon: '/common/ic_doc.png' },
@@ -217,12 +219,16 @@ export default {
     } else if (index === 1) {
       Route.go('pages/novel/novel', {});
     } else if (index === 2) {
-      Route.go(SHELF_PAGE, { tab: 'bookmark' });
+      Route.go('pages/ai/ai', {});
     } else if (index === 3) {
-      Route.go(SHELF_PAGE, { tab: 'history' });
+      Route.go('pages/rss/rss', {});
     } else if (index === 4) {
-      Route.go(OFFLINE_PAGE, {});
+      Route.go(SHELF_PAGE, { tab: 'bookmark' });
     } else if (index === 5) {
+      Route.go(SHELF_PAGE, { tab: 'history' });
+    } else if (index === 6) {
+      Route.go(OFFLINE_PAGE, {});
+    } else if (index === 7) {
       Route.go(READER_PAGE, { url: Txt.TEST_URL });
     }
   },

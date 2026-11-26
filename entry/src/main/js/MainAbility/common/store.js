@@ -253,7 +253,13 @@ function loadDataset(name, storageKey, apply) {
       finish();
     }
   }
-  Fs.readSmall(DATA_BASE + name + '.txt', function (raw) {
+  Fs.readSmall(DATA_BASE + name + '.txt', function (raw, readOk, readCode) {
+    /* 301=文件不存在，才允许进入迁移/初始化；300/302/超时等读错误
+       必须保留内存空值，绝不能写空表覆盖原有数据。 */
+    if (!readOk && String(readCode) !== '301') {
+      settle('');
+      return;
+    }
     if (raw) {
       settle(raw);
       return;
@@ -262,9 +268,13 @@ function loadDataset(name, storageKey, apply) {
       if (parts) {
         settle(parts);
         Fs.ensureDir(DATA_DIR, function () {
-          Fs.writeSmall(DATA_BASE + name + '.txt', parts, function () {});
+          /* 只有迁移写成功后才删旧分片，避免“新文件没写成、旧数据已删”。 */
+          Fs.writeSmall(DATA_BASE + name + '.txt', parts, function (ok) {
+            if (ok) {
+              Fs.quietDeleteRange(DATA_BASE + name + '.', 0, LEGACY_MAX_PARTS);
+            }
+          });
         });
-        Fs.quietDeleteRange(DATA_BASE + name + '.', 0, LEGACY_MAX_PARTS);
         return;
       }
       try {
@@ -275,13 +285,17 @@ function loadDataset(name, storageKey, apply) {
             var v = typeof legacy === 'string' ? legacy : '';
             if (v) {
               Fs.ensureDir(DATA_DIR, function () {
-                Fs.writeSmall(DATA_BASE + name + '.txt', v, function () {});
+                Fs.writeSmall(DATA_BASE + name + '.txt', v, function (ok) {
+                  /* 单文件写成功后才删 legacy storage，失败时保留旧值重试。 */
+                  if (ok) {
+                    try {
+                      storage.delete({ key: storageKey });
+                    } catch (err) {
+                      /* ignore */
+                    }
+                  }
+                });
               });
-              try {
-                storage.delete({ key: storageKey });
-              } catch (err) {
-                /* ignore */
-              }
               settle(v);
               return;
             }

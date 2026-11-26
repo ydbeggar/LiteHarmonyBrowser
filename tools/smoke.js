@@ -1628,6 +1628,20 @@ function runLayoutCases() {
     eq(Layout._pageFor({ windowWidth: 408, windowHeight: 480 }, 'reader').round, false);
   });
 
+  test('v1.1.2 ai/rss pages have complete FIT and ROUND geometry', function () {
+    const pages = ['ai', 'rss'];
+    for (let i = 0; i < pages.length; i += 1) {
+      const fit = Layout._pageFor({ screenShape: 'rect', windowWidth: 408, windowHeight: 480, apiVersion: 26 }, pages[i]);
+      const rd = Layout._pageFor({ screenShape: 'circle', windowWidth: 466, windowHeight: 466, apiVersion: 26 }, pages[i]);
+      eq(fit.w, 408);
+      eq(rd.w, 466);
+      eq(fit.round, false);
+      eq(rd.round, true);
+      assert(fit.hdrX !== undefined && rd.hdrX !== undefined, pages[i] + ' header geometry');
+      assert(fit.listY > 0 && rd.listY > 0, pages[i] + ' list geometry');
+    }
+  });
+
   test('model fallback recognises GT / FIT when dimensions are absent', function () {
     eq(Layout._pageFor({ model: 'HUAWEI WATCH GT 5' }, 'reader').round, true);
     eq(Layout._pageFor({ model: 'HUAWEI WATCH FIT 5 Pro' }, 'reader').round, false);
@@ -2168,6 +2182,115 @@ function runPageStoreCases() {
   });
 }
 
+function runFileBudgetCases() {
+  section('fsutil(UTF-8 byte budget)');
+  const Fs = loadCommon('fsutil');
+
+  test('splitText caps each part at 1200 chars and 3600 UTF-8 bytes', function () {
+    const parts = Fs.splitText('😀'.repeat(1200), Fs.PART_CHARS, 24);
+    eq(parts.length > 1, true, '4-byte chars need more than one part');
+    for (let i = 0; i < parts.length; i += 1) {
+      assert(Fs.utf8Len(parts[i]) <= Fs.PART_BYTES, 'part bytes <= 3600');
+      assert(parts[i].length <= 1200, 'part chars <= 1200');
+    }
+    eq(parts.join(''), '😀'.repeat(1200));
+  });
+
+  test('splitText keeps ASCII within one 1200-char part', function () {
+    const parts = Fs.splitText('a'.repeat(1200), Fs.PART_CHARS, 24);
+    eq(parts.length, 1);
+    eq(parts[0].length, 1200);
+  });
+}
+
+function runRssCases() {
+  section('rss(RSS 2.0 / Atom)');
+  const Rss = loadCommon('rss');
+
+  test('parses RSS 2.0 titles, links and CDATA description', function () {
+    const xml = '<?xml version="1.0"?><rss><channel><title>测试频道</title>' +
+      '<item><title><![CDATA[第一条新闻]]></title><link>https://example.com/1</link>' +
+      '<description><![CDATA[<p>正文摘要</p>]]></description>' +
+      '<pubDate>Thu, 26 Nov 2026 15:00:00 +0800</pubDate></item></channel></rss>';
+    const r = Rss.parse(xml, '测试');
+    eq(r.title, '测试频道');
+    eq(r.items.length, 1);
+    eq(r.items[0].title, '第一条新闻');
+    eq(r.items[0].link, 'https://example.com/1');
+    eq(r.items[0].summary, '正文摘要');
+    eq(r.items[0].date, '11-26 15:00');
+  });
+
+  test('decodes escaped HTML in description', function () {
+    const xml = '<rss><channel><item><title>A</title><link>u</link>' +
+      '<description>&lt;p&gt;第一段&lt;/p&gt;&lt;p&gt;第二段&lt;/p&gt;</description></item></channel></rss>';
+    const r = Rss.parse(xml, 'x');
+    assert(r.items[0].summary.indexOf('第一段') >= 0, 'keeps text');
+    assert(r.items[0].summary.indexOf('<p>') < 0, 'strips escaped tags');
+  });
+
+  test('parses Atom entries and href links', function () {
+    const xml = '<feed><title>Atom 源</title><entry><title>Atom 新闻</title>' +
+      '<link href="https://example.com/a" rel="alternate"/>' +
+      '<summary>摘要</summary><updated>2026-11-26T12:00:00Z</updated></entry></feed>';
+    const r = Rss.parse(xml, 'Atom');
+    eq(r.title, 'Atom 源');
+    eq(r.items.length, 1);
+    eq(r.items[0].link, 'https://example.com/a');
+    eq(r.items[0].date, '2026-11-26 12:00');
+  });
+
+  test('empty feed reports no-items', function () {
+    const r = Rss.parse('<rss><channel><title>x</title></channel></rss>', 'x');
+    eq(r.items.length, 0);
+    eq(r.error, 'no-items');
+  });
+}
+
+function runMarkdownCases() {
+  section('md(Markdown -> plain text)');
+  const Md = loadCommon('md');
+
+  test('strips headings, links and images', function () {
+    const text = Md.toText('# 标题\n\n[链接文字](https://example.com)\n\n![图片](https://x/a.png)\n\n**加粗**');
+    eq(text, '标题\n\n链接文字\n\n加粗');
+  });
+
+  test('strips code fences but keeps code text', function () {
+    const text = Md.toText('```\nvar a = 1;\n```\n\n正文');
+    eq(text, 'var a = 1;\n\n正文');
+  });
+
+  test('decodes entities', function () {
+    eq(Md.toText('A &amp; B'), 'A & B');
+  });
+}
+
+function runAiConfigCases() {
+  section('aicfg(DeepSeek key persistence)');
+  const Cfg = loadCommon('aicfg');
+  test('masks keys', function () {
+    eq(Cfg.mask('sk-1234567890abcdef'), 'sk-1****cdef');
+    eq(Cfg.mask(''), '未设置');
+  });
+  test('save/load round-trip through storage', function () {
+    Cfg.saveKey('sk-test-123456', function (ok) {
+      eq(ok, true);
+    });
+    Cfg.load(function (cfg) {
+      eq(cfg.hasKey, true);
+      eq(cfg.enabled, true);
+      eq(cfg.key, 'sk-test-123456');
+    });
+  });
+  test('rejects empty key', function () {
+    Cfg.saveKey('', function (ok, reason) {
+      eq(ok, false);
+      assert(reason.length > 0, 'has reason');
+    });
+  });
+}
+
 function main() {
   /* v1.0.2：真机默认在文件调用之间插入一拍宏任务（防原生回调内重入文件服务，
      离线保存完成即崩的修复）。冒烟需要确定性的同步回调链，这里显式关掉；
@@ -2192,6 +2315,10 @@ function main() {
   runRouteCases();
   runLinkpassCases();
   runLayoutCases();
+  runFileBudgetCases();
+  runRssCases();
+  runMarkdownCases();
+  runAiConfigCases();
   runScreenCases();
   runSpaceCases();
   runVersionCases();

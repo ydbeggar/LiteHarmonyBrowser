@@ -193,8 +193,122 @@ function fetchText(url, cb, opts) {
   return { seq: mySeq };
 }
 
+/**
+ * 通用请求（v1.1.2，DeepSeek Search/Fetch 用）。
+ *
+ * 与 fetchText 共用序号令牌：任何新请求都会让旧请求的回调失效，
+ * 因此同一时刻只允许一个网络请求（页面层负责串行）。
+ *
+ * @param {string} url
+ * @param {{onSuccess:function,onFail:function}} cb
+ * @param {{method:string,header:object,data:string,responseType:string,
+ *          timeoutMs:number,maxChars:number}=} opts
+ */
+function request(url, cb, opts) {
+  var callbacks = cb || {};
+  var options = opts || {};
+  var profile = Layout.net();
+  var timeoutMs = options.timeoutMs ? Math.floor(options.timeoutMs) : profile.timeoutMs;
+  var maxChars = options.maxChars ? Math.floor(options.maxChars) : 200000;
+  seq += 1;
+  var mySeq = seq;
+  var finished = false;
+  var timer = 0;
+
+  function fail(reason) {
+    if (finished || mySeq !== seq) {
+      return;
+    }
+    finished = true;
+    if (timer) {
+      clearTimeout(timer);
+      timer = 0;
+    }
+    if (typeof callbacks.onFail === 'function') {
+      callbacks.onFail(reason);
+    }
+  }
+
+  function succeed(text) {
+    if (finished || mySeq !== seq) {
+      return;
+    }
+    finished = true;
+    if (timer) {
+      clearTimeout(timer);
+      timer = 0;
+    }
+    if (typeof callbacks.onSuccess === 'function') {
+      callbacks.onSuccess(text);
+    }
+  }
+
+  if (!syscap('SystemCapability.Communication.NetStack')) {
+    setTimeout(function () {
+      fail('unsupported');
+    }, 0);
+    return { seq: mySeq };
+  }
+
+  checkNetwork(function (online) {
+    if (finished || mySeq !== seq) {
+      return;
+    }
+    if (!online) {
+      fail('offline');
+      return;
+    }
+    timer = setTimeout(function () {
+      fail('timeout');
+    }, timeoutMs);
+    try {
+      var header = options.header || {};
+      if (!header['Accept']) {
+        header['Accept'] = 'application/json,text/plain,*/*';
+      }
+      if (!header['User-Agent']) {
+        header['User-Agent'] = 'LiteHarmonyBrowser/1.1.2';
+      }
+      fetch.fetch({
+        url: url,
+        method: options.method || 'GET',
+        responseType: options.responseType || 'text',
+        header: header,
+        data: options.data,
+        success: function (response) {
+          if (finished || mySeq !== seq) {
+            return;
+          }
+          var code = response && response.code ? Number(response.code) : 0;
+          if (code >= 400) {
+            fail('http-' + code);
+            return;
+          }
+          var data = response ? response.data : '';
+          if (typeof data !== 'string') {
+            succeed(data);
+            return;
+          }
+          if (maxChars > 0 && data.length > maxChars) {
+            data = data.substring(0, maxChars);
+          }
+          succeed(data);
+        },
+        fail: function (data, code) {
+          fail(classify(code));
+        }
+      });
+    } catch (err) {
+      fail('unreachable');
+    }
+  });
+
+  return { seq: mySeq };
+}
+
 export default {
   fetchText: fetchText,
+  request: request,
   cancel: function () {
     seq += 1;
   },

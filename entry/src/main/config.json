@@ -3,8 +3,8 @@
     "bundleName": "com.example.litewearbrowser",
     "vendor": "example",
     "version": {
-      "code": 1101,
-      "name": "1.1.1"
+      "code": 1102,
+      "name": "1.1.2"
     },
     "apiVersion": {
       "compatible": 50000012,
@@ -47,13 +47,17 @@
           "pages/search/search",
           "pages/offline/offline",
           "pages/novel/novel",
+          "pages/ai/ai",
+          "pages/rss/rss",
           "pages/round/reader/reader",
           "pages/round/links/links",
           "pages/round/shelf/shelf",
           "pages/round/settings/settings",
           "pages/round/search/search",
           "pages/round/offline/offline",
-          "pages/round/novel/novel"
+          "pages/round/novel/novel",
+          "pages/round/ai/ai",
+          "pages/round/rss/rss"
         ]
       }
     ],

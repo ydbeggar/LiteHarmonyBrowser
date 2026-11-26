@@ -1,7 +1,7 @@
 # 轻鸿浏览器（LiteHarmonyBrowser）
 
 > 运行在华为 Lite Wearable 手表上的纯 JS 文本浏览器 / 小说阅读器。
-> 当前版本：**1.1.1（versionCode 1101）** ｜ 包名：`com.example.litewearbrowser`
+> 当前版本：**1.1.2（versionCode 1102）** ｜ 包名：`com.example.litewearbrowser`
 > 目标设备：HUAWEI WATCH FIT 5 Pro（408×480 方屏）+ GT 系列（466×466 圆屏）
 
 ## 一、这是什么
@@ -9,7 +9,10 @@
 - 输入网址或关键词抓取网页正文，按手表屏幕自动分页阅读。
 - 支持书签、历史、离线网页、字号/行距、屏幕常亮。
 - 支持小说搜索：输入书名 → 必应 RSS → 自动打开第一条结果。
-- 无 WebView，全部由 `@system.fetch` + 自研 HTML 解析 + 分页渲染实现。
+- **v1.1.2 新增增强搜索**：手动保存 DeepSeek API Key（本地持久化）→ Search 找网页 → Fetch 抓取全文 → 纯文本阅读；Key 不写死、不进日志、不进 Git。
+- **v1.1.2 新增 RSS 新闻**：5 个公共 RSS 源，列表/频道/详情三视图，支持阅读原文。
+- 无 WebView，全部由 `@system.fetch` + 自研 HTML/RSS 解析 + 分页渲染实现。
+- 最终 HAP 为 **BIN-only**：页面图片和应用图标均为 `.bin`，安装包内 0 个 PNG（源文件开发阶段仍保留 PNG）。
 
 ## 二、目录
 
@@ -29,11 +32,11 @@ cd <repo>
 pwsh -File tools\build.ps1
 ```
 
-流程：冒烟测试（133 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/`。
+流程：冒烟测试（146 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/` → `verify-build.ps1` 检查 0 PNG、双端页面齐全、页面 JS <112KB。
 
 ## 四、Git 使用（非开发人员版）
 
-本仓库已初始化为本地 Git 仓库，默认分支 `main`，并已打 `v1.1.1` 标签。
+本仓库已初始化为本地 Git 仓库，默认分支 `main`，并已打 `v1.1.1` 标签；当前开发分支为 `feat/v1.1.2`。
 
 ### 查看当前状态
 

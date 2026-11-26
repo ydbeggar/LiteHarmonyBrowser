@@ -1,0 +1,290 @@
+/* RSS 新闻 — 方屏 408×480 */
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+}
+
+.view {
+  width: 408px;
+  height: 480px;
+}
+
+.hdr {
+  width: 376px;
+  height: 48px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hdr-btn {
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.hdr-btn-flat {
+  background-color: #000000;
+}
+
+.hdr-btn-action {
+  width: 64px;
+  border-radius: 22px;
+}
+
+.hdr-back {
+  width: 38px;
+  height: 38px;
+}
+
+.hdr-title {
+  width: 200px;
+  height: 32px;
+  font-size: 30px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.hdr-action {
+  width: 60px;
+  height: 26px;
+  font-size: 17px;
+  line-height: 26px;
+  color: #64B5FF;
+  text-align: center;
+}
+
+.source-bar {
+  width: 376px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1C1C1E;
+  border-radius: 26px;
+}
+
+.source-name {
+  width: 260px;
+  left: 20px;
+  height: 30px;
+  font-size: 22px;
+  line-height: 30px;
+  color: #FFFFFF;
+}
+
+.source-arrow {
+  width: 96px;
+  right: 16px;
+  height: 28px;
+  font-size: 17px;
+  line-height: 28px;
+  color: #64B5FF;
+  text-align: right;
+}
+
+.area {
+  width: 376px;
+}
+
+.list {
+  width: 376px;
+}
+
+.spacer-item,
+.tail-item {
+  width: 376px;
+  height: 6px;
+}
+
+.spacer,
+.tail {
+  width: 376px;
+  height: 6px;
+}
+
+.item {
+  width: 376px;
+}
+
+.item-inner {
+  width: 376px;
+  background-color: #1C1C1E;
+  border-radius: 24px;
+}
+
+.item-title {
+  width: 336px;
+  left: 20px;
+  top: 8px;
+  height: 52px;
+  font-size: 24px;
+  line-height: 26px;
+  color: #FFFFFF;
+}
+
+.item-meta {
+  width: 336px;
+  left: 20px;
+  top: 60px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 18px;
+  color: #8E8E93;
+}
+
+.item-sum {
+  width: 336px;
+  left: 20px;
+  top: 78px;
+  height: 16px;
+  font-size: 14px;
+  line-height: 16px;
+  color: #64B5FF;
+}
+
+.state {
+  width: 376px;
+  height: 288px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.state-title {
+  width: 340px;
+  height: 36px;
+  font-size: 24px;
+  line-height: 36px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.state-sub {
+  width: 340px;
+  height: 30px;
+  font-size: 17px;
+  line-height: 30px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+.channel-list {
+  width: 376px;
+}
+
+.channel-item {
+  width: 376px;
+}
+
+.channel-inner {
+  width: 376px;
+  background-color: #1C1C1E;
+  border-radius: 24px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.channel-name {
+  width: 280px;
+  left: 20px;
+  height: 32px;
+  font-size: 24px;
+  line-height: 32px;
+  color: #FFFFFF;
+}
+
+.channel-arrow {
+  width: 32px;
+  right: 18px;
+  height: 32px;
+  font-size: 26px;
+  line-height: 32px;
+  color: #64B5FF;
+  text-align: right;
+}
+
+.detail {
+  width: 376px;
+}
+
+.d-title {
+  width: 376px;
+  font-size: 26px;
+  line-height: 28px;
+  color: #FFFFFF;
+}
+
+.d-meta {
+  width: 376px;
+  font-size: 15px;
+  line-height: 20px;
+  color: #8E8E93;
+}
+
+.d-body {
+  width: 376px;
+}
+
+.d-para-item {
+  width: 376px;
+}
+
+.d-para {
+  width: 376px;
+  font-size: 20px;
+  line-height: 26px;
+  color: #64B5FF;
+}
+
+.d-foot {
+  width: 376px;
+}
+
+.btn {
+  width: 376px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #1C1C1E;
+}
+
+.primary {
+  background-color: #2D6CFF;
+}
+
+.btn-txt {
+  width: 200px;
+  height: 30px;
+  font-size: 22px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.shader-top {
+  height: 48px;
+}
+
+.shader {
+  width: 408px;
+  height: 48px;
+}
+
