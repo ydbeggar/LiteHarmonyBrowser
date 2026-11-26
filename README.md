@@ -14,7 +14,13 @@
 - 无 WebView，全部由 `@system.fetch` + 自研 HTML/RSS 解析 + 分页渲染实现。
 - 最终 HAP 为 **BIN-only**：页面图片和应用图标均为 `.bin`，安装包内 0 个 PNG（源文件开发阶段仍保留 PNG）。
 
-## 二、目录
+## 二、下载
+
+每个版本的**未签名 `.app`** 可在仓库的 [Releases](https://github.com/ydbeggar/LiteHarmonyBrowser/releases) 页面下载，文件名形如 `LiteHarmonyBrowser-v1.1.2-unsigned-final.app`。
+
+未签名包需使用 DevEco Studio 配置本机签名后再安装或上架；仓库内 `dist/unsigned/` 同时保留了历史未签名 `.hap` / `.app`。
+
+## 三、目录
 
 ```text
 AppScope/                 应用级配置（版本号、图标）
@@ -25,23 +31,23 @@ tools/                    构建、打包、冒烟测试、Git 保存脚本
 dist/                     历史构建产物（HAP/APP）
 ```
 
-## 三、构建
+## 四、构建
+
+在工程根目录执行：
 
 ```powershell
-cd <repo>
 pwsh -File tools\build.ps1
 ```
 
 流程：冒烟测试（146 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/` → `verify-build.ps1` 检查 0 PNG、双端页面齐全、页面 JS <112KB。
 
-## 四、Git 使用（非开发人员版）
+## 五、Git 使用
 
-本仓库已初始化为本地 Git 仓库，默认分支 `main`，并已打 `v1.1.1` 标签；当前开发分支为 `feat/v1.1.2`。
-
-### 查看当前状态
+默认分支 `main`，已有标签 `v1.1.1`、`v1.1.2`，当前开发分支 `feat/v1.1.2`。
 
 ```powershell
-git status
+git clone https://github.com/ydbeggar/LiteHarmonyBrowser.git
+cd LiteHarmonyBrowser
 ```
 
 ### 保存一次版本（最常用）
@@ -49,6 +55,7 @@ git status
 ```powershell
 git add -A
 git commit -m "说明这次改了什么"
+git push
 ```
 
 或者用封装脚本：
@@ -71,16 +78,16 @@ git checkout v1.1.1     # 查看 v1.1.1 的代码（只读状态）
 git checkout main       # 回到最新主线
 ```
 
-> 日常只需要记住：**改完代码 → `git add -A` → `git commit -m "说明"`**。
+> 日常只需要记住：**改完代码 → `git add -A` → `git commit -m "说明"` → `git push`**。
 > DevEco Studio 自带 Git 面板，也可以在左下角「Git」里点“提交”。
 
 ### 注意
 
-- `build-profile.json5` 含本机签名证书配置，**已设置为不进入 Git**；当前文件仍在工程根目录，构建不受影响。
-- 换电脑重建仓库时，可复制 `build-profile.example.json5` 为 `build-profile.json5`，再在 DevEco 里配置签名。
+- `build-profile.json5` 含本机签名证书配置，**不进入 Git**；首次克隆后可复制 `build-profile.example.json5` 为 `build-profile.json5`，再在 DevEco 里配置签名。
 - 构建产物 `dist/` 会进入 Git（体积约 10 MB），方便找回历史版本；`entry/build/`、`.hvigor/` 不进入 Git。
+- 仓库不包含签名证书、密钥或 API Key。
 
-## 五、发布新版本时
+## 六、发布新版本时
 
 版本号三处必须同步：
 
@@ -90,9 +97,9 @@ git checkout main       # 回到最新主线
 
 `tools/smoke.js` 的 `[version consistency]` 用例会自动校验三处一致。
 
-## 六、更多文档
+## 七、更多文档
 
 - `docs/HANDOVER.md`：完整开发史与关键坑
 - `docs/design-v2.md`：视觉/动效设计
 - `docs/device-fit5pro.md`：FIT5 Pro 实测性能
-- 工作区恢复档案：`内部恢复档案（不随仓库发布）`
+- `docs/install.md`：安装、签名与排错
