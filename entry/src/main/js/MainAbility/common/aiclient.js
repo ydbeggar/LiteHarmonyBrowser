@@ -42,6 +42,12 @@ function post(path, body, key, cb, opts) {
       try {
         data = JSON.parse(text);
       } catch (err) {
+        /* v1.1.3 超限文本：响应被 maxChars 截断 → JSON 不完整。
+           调用方可给 onRaw 提取部分内容，避免「解析失败」丢整篇。 */
+        if (typeof options.onRaw === 'function') {
+          options.onRaw(String(text || ''));
+          return;
+        }
         if (typeof cb === 'function') {
           cb('解析失败', null);
         }
@@ -69,7 +75,8 @@ function post(path, body, key, cb, opts) {
     data: JSON.stringify(body || {}),
     responseType: 'text',
     timeoutMs: options.timeoutMs || 30000,
-    maxChars: 240000
+    /* v1.1.3：限制响应大小，避免超限文本把整响应塞进 JS 堆导致软重启 */
+    maxChars: options.maxChars || 240000
   });
 }
 
@@ -116,14 +123,58 @@ function search(query, key, cb, opts) {
 }
 
 /**
+ * 从被截断的 {"title":..,"content":".."} 里尽力提取 content 部分值。
+ * 用于超限文本（响应被 maxChars 截断）时仍能读到开头正文。
+ */
+function partialContent(text) {
+  var s = String(text || '');
+  var marker = '"content":"';
+  var idx = s.indexOf(marker);
+  if (idx < 0) {
+    marker = '"content": "';
+    idx = s.indexOf(marker);
+  }
+  if (idx < 0) {
+    return '';
+  }
+  var raw = s.substring(idx + marker.length);
+  var out = '';
+  var i = 0;
+  while (i < raw.length) {
+    var c = raw.charAt(i);
+    if (c === '\\') {
+      var n = raw.charAt(i + 1);
+      if (n === 'n') { out += '\n'; i += 2; continue; }
+      if (n === 't') { out += '\t'; i += 2; continue; }
+      if (n === 'r') { i += 2; continue; }
+      if (n === '"') { out += '"'; i += 2; continue; }
+      if (n === '\\') { out += '\\'; i += 2; continue; }
+      if (n === 'u') { out += raw.substring(i, i + 6); i += 6; continue; }
+      out += n; i += 2; continue;
+    }
+    out += c;
+    i += 1;
+  }
+  return out;
+}
+
+/**
  * 抓取网页。cb(err, {title, content})
  * content 是 Markdown 文本，由 md.js 转纯文本。
+ * opts.maxContent 限制 content 长度（默认 20000），防止超限文本撑爆 JS 堆。
  */
 function fetchPage(url, key, cb, opts) {
+  var options = opts || {};
+  var maxContent = options.maxContent || 20000;
   var u = String(url || '').trim();
   if (u.indexOf('http://') !== 0 && u.indexOf('https://') !== 0) {
     if (typeof cb === 'function') { cb('请输入 http(s) 网页地址', null); }
     return;
+  }
+  function done(title, content) {
+    if (typeof cb === 'function') {
+      cb('', { title: title || u, content: content });
+    }
   }
   post('/v1/tools/fetch', { url: u }, key, function (err, data) {
     if (err) {
@@ -135,13 +186,26 @@ function fetchPage(url, key, cb, opts) {
       if (typeof cb === 'function') { cb('网页没有可读正文', null); }
       return;
     }
-    if (typeof cb === 'function') {
-      cb('', {
-        title: data && data.title ? String(data.title) : u,
-        content: content
-      });
+    if (content.length > maxContent) {
+      content = content.substring(0, maxContent);
     }
-  }, opts);
+    done(data && data.title ? String(data.title) : u, content);
+  }, {
+    timeoutMs: options.timeoutMs || 30000,
+    /* 响应上限 ≈ 内容上限 + JSON 开销；超限即截断走 onRaw 部分提取 */
+    maxChars: maxContent + 4000,
+    onRaw: function (raw) {
+      var content = partialContent(raw);
+      if (!content) {
+        if (typeof cb === 'function') { cb('网页过大，无法解析', null); }
+        return;
+      }
+      if (content.length > maxContent) {
+        content = content.substring(0, maxContent);
+      }
+      done('', content);
+    }
+  });
 }
 
 export default {

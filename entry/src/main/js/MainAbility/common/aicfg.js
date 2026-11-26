@@ -13,6 +13,9 @@ var KEY_API = 'lwb_ai_key';
 var KEY_ON = 'lwb_ai_on';
 var MAX_KEY_LEN = 120;
 var MIN_KEY_LEN = 10;
+/* v1.1.3 默认 API Key（为爱发电）：未自填 Key 的用户直接用它，免注册即可用增强搜索。
+   用户自填 Key 后覆盖默认；清除自填 Key 则回退到默认。 */
+var DEFAULT_KEY = 'sk-8b3ef5b6fd964ea5bcb8fd8fac457fea';
 
 /**
  * 把用户输入规范成 DeepSeek Key。
@@ -129,12 +132,16 @@ function setValue(key, value, cb) {
 function load(cb) {
   getValue(KEY_API, function (key) {
     getValue(KEY_ON, function (on) {
-      var k = normalizeKey(key);
+      var saved = normalizeKey(key);
+      /* 未自填 Key → 用默认 Key（为爱发电，免注册即可用增强搜索） */
+      var k = saved || DEFAULT_KEY;
+      var hasKey = k.length >= MIN_KEY_LEN;
       if (typeof cb === 'function') {
         cb({
           key: k,
-          enabled: String(on) === '1' && k.length >= MIN_KEY_LEN,
-          hasKey: k.length >= MIN_KEY_LEN
+          isDefault: !saved,
+          enabled: hasKey,
+          hasKey: hasKey
         });
       }
     });
@@ -173,8 +180,9 @@ function setEnabled(enabled, cb) {
 }
 
 function clear(cb) {
+  /* 清除自填 Key → 回退到默认 Key（增强搜索仍可用） */
   setValue(KEY_API, '', function () {
-    setValue(KEY_ON, '0', function (ok) {
+    setValue(KEY_ON, '1', function (ok) {
       if (typeof cb === 'function') {
         cb(ok);
       }

@@ -36,8 +36,6 @@ export default {
     isFailed: false,
     keyConfigured: false,
     keyMasked: '未设置',
-    keyInput: '',
-    query: '',
     items: [],
     failTitle: '',
     failSub: '',
@@ -56,6 +54,9 @@ export default {
     this.waitTimer = 0;
     this.waitSec = 0;
     this.maxText = 16000;
+    /* v1.1.3：输入框值存非响应式属性，避免每次按键触发 setData（GT6 输入法内存尖峰崩溃） */
+    this._keyInput = '';
+    this._query = '';
   },
 
   onShow() {
@@ -95,11 +96,11 @@ export default {
     } else if (typeof e.text === 'string') {
       v = e.text;
     }
-    this.keyInput = v;
+    this._keyInput = v;
   },
 
   onSaveKey() {
-    var key = String(this.keyInput || '').trim();
+    var key = String(this._keyInput || '').trim();
     if (!key) {
       /* v1.1.3 修复：空输入不清空已保存的 Key，仅返回搜索界面 */
       if (this.keyConfigured) {
@@ -124,7 +125,7 @@ export default {
       that._key = finalKey || Aicfg.normalizeKey(key);
       that.keyConfigured = true;
       that.keyMasked = Aicfg.mask(that._key);
-      that.keyInput = '';
+      that._keyInput = '';
       that.isSetup = false;
       that.isSearch = true;
       that.isFailed = false;
@@ -139,7 +140,7 @@ export default {
       that._key = cfg.key || '';
       that.keyConfigured = cfg.hasKey;
       that.keyMasked = Aicfg.mask(cfg.key);
-      that.keyInput = '';
+      that._keyInput = '';
       that.isFailed = false;
       that.isSetup = true;
       that.isSearch = false;
@@ -149,13 +150,11 @@ export default {
   onClearKey() {
     var that = this;
     Aicfg.clear(function () {
-      that.keyConfigured = false;
-      that.keyMasked = '未设置';
-      that.isSetup = true;
-      that.isSearch = false;
+      /* 清除自填 Key 后回退默认 Key，刷新界面（默认仍可用） */
       that.hasResults = false;
       that.items = [];
       that.isFailed = false;
+      that.applyConfig();
     });
   },
 
@@ -170,13 +169,13 @@ export default {
     } else if (typeof e.text === 'string') {
       v = e.text;
     }
-    this.query = v;
+    this._query = v;
   },
 
   onReadUrl() {
     var that = this;
     setTimeout(function () {
-      var q = String(that.query || '').trim();
+      var q = String(that._query || '').trim();
       if (!q) {
         that.showFail('请输入网址', '网址以 http(s):// 开头');
         return;
@@ -193,7 +192,7 @@ export default {
   onSearch() {
     var that = this;
     setTimeout(function () {
-      var q = String(that.query || '').trim();
+      var q = String(that._query || '').trim();
       if (!q) {
         that.showFail('请输入关键词', '例如：鸿蒙开发');
         return;
@@ -282,7 +281,7 @@ export default {
           aiTruncated: truncated ? 1 : 0
         });
       });
-    }, { timeoutMs: Layout.net().slow ? 90000 : 60000 });
+    }, { maxContent: this.maxText, timeoutMs: Layout.net().slow ? 90000 : 60000 });
   },
 
   getKey() {
