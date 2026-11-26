@@ -40,7 +40,7 @@ dist/                     历史构建产物（HAP/APP）
 pwsh -File tools\build.ps1
 ```
 
-流程：冒烟测试（146 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/` → `verify-build.ps1` 检查 0 PNG、双端页面齐全、页面 JS <112KB。
+流程：冒烟测试（147 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/` → `verify-build.ps1` 检查 0 PNG、双端页面齐全、页面 JS <112KB。
 
 ## 五、Git 使用
 
@@ -104,3 +104,4 @@ git checkout main       # 回到最新主线
 - `docs/design-v2.md`：视觉/动效设计
 - `docs/device-fit5pro.md`：FIT5 Pro 实测性能
 - `docs/install.md`：安装、签名与排错
+
