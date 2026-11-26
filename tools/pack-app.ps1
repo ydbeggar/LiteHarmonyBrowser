@@ -28,7 +28,13 @@ param(
   # 固定条目时间戳，让同样的输入产出同样的字节（便于记录 SHA256 做回归比对）
   [string]$Timestamp = "2026-01-01T00:00:00+08:00",
   # v1.1.2：默认移除页面 PNG，只保留 DevEco 生成的 .png.bin（BIN-only 产物）
-  [switch]$KeepAppIcon
+  [switch]$KeepAppIcon,
+  # v1.1.3：默认移除 jerry-snapshot 字节码 .bc（运行时自动回退解析同名 .js，
+  # 已由 ai/reader/index/rss/search 共 9 个页面在真机验证）；体积约 -37%。
+  # 如需保留字节码（启动最快），加 -KeepBytecode。
+  [switch]$KeepBytecode,
+  # 与 -KeepBytecode 配合的保守档：只保留启动模块 app.bc（其余页面仍去掉）。
+  [switch]$KeepAppBytecode
 )
 
 $ErrorActionPreference = "Stop"
@@ -172,6 +178,8 @@ if (Test-Path $hapOut) { Remove-Item $hapOut -Force }
 $outZip = [System.IO.Compression.ZipFile]::Open($hapOut, [System.IO.Compression.ZipArchiveMode]::Create)
 $written = 0
 $droppedPng = 0
+$droppedBc = 0
+$droppedBcBytes = 0
 try {
   foreach ($name in $order) {
     $isImage = $name -match '\.(png|jpg|jpeg|bmp)$'
@@ -183,6 +191,15 @@ try {
       }
       $droppedPng += 1
       continue
+    }
+    if (-not $KeepBytecode -and $name -match '\.bc$') {
+      $keepThis = $KeepAppBytecode -and $name -eq 'assets/js/MainAbility/app.bc'
+      if (-not $keepThis) {
+        # 字节码可省：运行时找不到 .js.bc 会直接解析同名 .js（真机已验证）
+        $droppedBc += 1
+        $droppedBcBytes += $entries[$name].Length
+        continue
+      }
     }
     $entry = $outZip.CreateEntry($name, [System.IO.Compression.CompressionLevel]::Optimal)
     $entry.LastWriteTime = $fixedTime
@@ -227,6 +244,11 @@ Write-Host "版本        : $versionName ($versionCode)"
 Write-Host "config.json : compileSdkType=$CompileSdkType compileSdkVersion=$CompileSdkVersion mainAbility=$MainAbility package=$($config.app.bundleName) abilities=$abilityCount"
 Write-Host "pack.info   : 移除 modules[].apiVersion 共 $apiDrop 处"
 Write-Host "BIN-only    : 移除页面 PNG $droppedPng 个（保留 .png.bin）"
+if ($KeepBytecode) {
+  Write-Host "字节码      : 保留 .bc（-KeepBytecode）"
+} else {
+  Write-Host ("字节码      : 移除 .bc {0} 个（{1:N0} B，运行时回退解析 .js）" -f $droppedBc, $droppedBcBytes)
+}
 Write-Host "hap 条目数  : $written"
 Write-Host ""
 Write-Host ("hap : {0}  ({1:N0} B)" -f $hapOut, $hapInfo.Length)
