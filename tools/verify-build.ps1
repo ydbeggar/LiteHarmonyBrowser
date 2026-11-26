@@ -22,11 +22,14 @@ try {
   $entries = @{}
   foreach ($e in $zip.Entries) { $entries[$e.FullName] = $e.Length }
 
-  $png = @($entries.Keys | Where-Object { $_ -match '\.(png|jpg|jpeg|bmp)$' })
+  # 页面/运行时图片（assets/js/**）必须 BIN-only；系统启动图标（resources/**）允许 PNG
+  $png = @($entries.Keys | Where-Object { $_ -match '\.(png|jpg|jpeg|bmp)$' -and $_ -notmatch '^assets/entry/resources/' })
+  $appIconPng = @($entries.Keys | Where-Object { $_ -match '^assets/entry/resources/.*\.(png|jpg|jpeg|bmp)$' })
   Write-Host "HAP 条目数 : $($entries.Count)"
-  Write-Host "PNG 条目数 : $($png.Count)"
+  Write-Host "页面 PNG 条目数 : $($png.Count)（应为 0）"
+  Write-Host "系统图标 PNG : $($appIconPng.Count)（允许）"
   if ($png.Count -gt 0) {
-    Write-Host "PNG 残留：" -ForegroundColor Red
+    Write-Host "页面 PNG 残留：" -ForegroundColor Red
     $png | ForEach-Object { Write-Host "  $_" }
     $fail += 1
   }

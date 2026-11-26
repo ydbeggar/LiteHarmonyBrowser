@@ -20,6 +20,8 @@ import Sway from '../../common/sway.js';
 import Layout from '../../common/layout.js';
 import Aicfg from '../../common/aicfg.js';
 import Aiclient from '../../common/aiclient.js';
+import Aistore from '../../common/aistore.js';
+import Md from '../../common/md.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var STAR_LINE = '/common/star_line.png';
@@ -128,7 +130,7 @@ export default {
     if (Url.looksLikeUrl(q)) {
       var direct = Url.normalize(q);
       if (direct) {
-        Route.go(READER_PAGE, { url: direct });
+        this.openPage(direct, q);
         return;
       }
     }
@@ -312,11 +314,57 @@ export default {
   },
 
   /* 访问：跳阅读页打开网址 */
+  /* v1.1.3 增强模式预抓：开启增强搜索时用 DeepSeek Fetch 取纯文本→aistore→
+     阅读页按 aiKey 读取；关闭时走标准 HTML 解析（reader 不引入 AI 模块以控体积）。 */
+  openPage(url, title) {
+    var that = this;
+    Aicfg.load(function (cfg) {
+      if (!(cfg.enabled && cfg.hasKey)) {
+        Route.go(READER_PAGE, { url: url });
+        return;
+      }
+      that.isLoading = true;
+      that.isFailed = false;
+      that.startSpin();
+      Aiclient.fetchPage(url, cfg.key, function (err, page) {
+        that.stopSpin();
+        that.isLoading = false;
+        if (err) {
+          that.onFail('unreachable');
+          return;
+        }
+        var text = Md.toText(page.content || '');
+        if (!text || text.length < 20) {
+          that.onFail('unreachable');
+          return;
+        }
+        var max = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
+        var truncated = false;
+        if (text.length > max) {
+          text = text.substring(0, max);
+          truncated = true;
+        }
+        Aistore.save(url, text, function (ok) {
+          if (!ok) {
+            that.onFail('unreachable');
+            return;
+          }
+          Route.go(READER_PAGE, {
+            url: url,
+            title: page.title || title || url,
+            aiKey: Aistore.keyOf(url),
+            aiTruncated: truncated ? 1 : 0
+          });
+        });
+      }, { timeoutMs: Layout.net().slow ? 90000 : 60000 });
+    });
+  },
+
   onVisit() {
     if (!this.current.url) {
       return;
     }
-    Route.go(READER_PAGE, { url: this.current.url });
+    this.openPage(this.current.url, this.current.title);
   },
 
   onBack() {

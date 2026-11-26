@@ -19,9 +19,6 @@ import Sway from '../../common/sway.js';
 import PageStore from '../../common/pagestore.js';
 import Sched from '../../common/scheduler.js';
 import Aistore from '../../common/aistore.js';
-import Aicfg from '../../common/aicfg.js';
-import Aiclient from '../../common/aiclient.js';
-import Md from '../../common/md.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var TXT_SAVE = '收藏';
@@ -303,23 +300,12 @@ export default {
   netFetch(url) {
     Layout.syncConfig();
     var that = this;
-    /* v1.1.3：设置页开启增强搜索后，网页正文统一由 DeepSeek Fetch 返回
-       纯文本，不再走 @system.fetch + Html.parse；关闭时保持原 HTML 解析链。 */
-    Aicfg.load(function (cfg) {
-      if (cfg.enabled && cfg.hasKey) {
-        that.aiFetch(url, cfg.key);
-        return;
-      }
-      that.normalFetch(url);
-    });
-  },
-
-  normalFetch(url) {
-    var that = this;
     /* 响应上限 = 当前屏幕/性能档位的解析窗口（Layout.net().maxHtml）：
        解析器本来就只消费前 48K 字符，大站 100K+ 字符的响应多出来的部分是
        纯堆负担（创世 115K 响应里正文只占前 31K）。截断后瞬时峰值从 ~240K
-       降到 ~125K，顺带省一半传输；圆屏/老机型会进一步收紧。 */
+       降到 ~125K，顺带省一半传输；圆屏/老机型会进一步收紧。
+       v1.1.3：增强模式的网页正文由 search.js 预抓（DeepSeek Fetch→aistore）后
+       经 aiKey 传给 openAiText；本页保持原 HTML 解析链，避免单页 JS 体积超限。 */
     Net.fetchText(url, {
       onSuccess: function (text) {
         that.onBody(text);
@@ -328,50 +314,6 @@ export default {
         that.onFail(reason);
       }
     }, { maxChars: Layout.net().parseWindowChars });
-  },
-
-  aiFetch(url, key) {
-    var that = this;
-    Aiclient.fetchPage(url, key, function (err, page) {
-      if (err) {
-        toast(err);
-        that.onFail('ai-fail');
-        return;
-      }
-      var text = Md.toText(page.content || '');
-      if (!text || text.length < Config.MIN_TEXT_CHARS) {
-        that.onFail('unsupported');
-        return;
-      }
-      var max = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
-      var truncated = false;
-      if (text.length > max) {
-        text = text.substring(0, max);
-        truncated = true;
-      }
-      that.stopSpinner();
-      that.stopLoadMeter();
-      var doc = {
-        url: url,
-        title: page.title || Url.displayOf(url),
-        text: text,
-        links: [],
-        nextHref: '',
-        prevHref: '',
-        startHref: '',
-        chapters: [],
-        truncated: truncated,
-        kind: 'text',
-        ai: true,
-        status: 'ok',
-        failReason: '',
-        fetchedAt: Date.now()
-      };
-      that.install(doc, 0, that.restoreOffset || 0);
-      if (truncated) {
-        toast('网页较长，已截断显示');
-      }
-    }, { timeoutMs: Layout.net().slow ? 90000 : 60000 });
   },
 
   onBody(text) {
