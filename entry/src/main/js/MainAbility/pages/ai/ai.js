@@ -73,13 +73,12 @@ export default {
       that._key = cfg.key || '';
       that.keyConfigured = cfg.hasKey;
       that.keyMasked = Aicfg.mask(cfg.key);
-      that.isSetup = !cfg.enabled;
-      that.isSearch = cfg.enabled;
+      /* v1.1.3：本页只负责 API Key 设置，不再承载独立搜索页。 */
+      that.isSetup = true;
+      that.isSearch = false;
       that.isLoading = false;
       that.isFailed = false;
-      if (cfg.enabled) {
-        that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
-      }
+      that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
     });
   },
 
@@ -117,10 +116,11 @@ export default {
       that.keyConfigured = true;
       that.keyMasked = Aicfg.mask(that._key);
       that.keyInput = '';
-      that.isSetup = false;
-      that.isSearch = true;
+      that.isSetup = true;
+      that.isSearch = false;
       that.isFailed = false;
-      that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
+      /* 从信息页进入：保存后回到首页，由信息页总开关继续控制是否启用。 */
+      Route.goHome();
     });
   },
 
@@ -283,15 +283,7 @@ export default {
   onBack() {
     this.stopWait();
     Net.cancel();
-    if (this.isSetup) {
-      Route.goHome();
-      return;
-    }
-    if (this.hasResults) {
-      this.hasResults = false;
-      this.isFailed = false;
-      return;
-    }
+    /* 本页从信息页进入，返回首页。 */
     Route.goHome();
   },
 

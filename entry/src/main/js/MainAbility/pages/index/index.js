@@ -5,6 +5,8 @@ import Crown from '../../common/crown.js';
 import Space from '../../common/space.js';
 import Layout from '../../common/layout.js';
 import Store from '../../common/store.js';
+import Aicfg from '../../common/aicfg.js';
+import Aiclient from '../../common/aiclient.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var SHELF_PAGE = 'pages/shelf/shelf';
@@ -24,7 +26,6 @@ export default {
     menu: [
       { key: 'search', name: '搜索网页', icon: '/common/ic_search.png' },
       { key: 'novel', name: '搜索小说', icon: '/common/ic_novel.png' },
-      { key: 'ai', name: '增强搜索', icon: '/common/ic_ai.png' },
       { key: 'rss', name: 'RSS 新闻', icon: '/common/ic_rss.png' },
       { key: 'bookmark', name: '我的书签', icon: '/common/ic_book.png' },
       { key: 'history', name: '浏览历史', icon: '/common/ic_clock.png' },
@@ -45,6 +46,12 @@ export default {
     /* v1.0.8 清除全部数据（崩溃修复用） */
     clearAllLabel: '清除全部数据',
     clearAllColor: '#FFFFFF',
+    /* v1.1.3 增强搜索总开关 + API 连通性测试（信息页） */
+    aiOnBg: '#1C1C1E', aiOnFg: '#8E8E93',
+    aiOffBg: '#1C1C1E', aiOffFg: '#8E8E93',
+    aiKeyText: '点此设置 API Key',
+    apiTestText: '点击测试 API 连通性',
+    apiTestColor: '#8E8E93',
     /* 双屏几何：默认方屏 408×480（与原 CSS 完全一致）；
        Layout.init 检测到圆屏后整体替换为 466×466 纵向压缩布局。 */
     g: Layout.page('index'),
@@ -71,6 +78,7 @@ export default {
     /* 表冠焦点（微信 rotateChange 同款）：随所在页聚焦对应列表 */
     this.armCrown();
     this.refreshSpace();
+    this.refreshAi();
   },
 
   onHide() {
@@ -121,6 +129,79 @@ export default {
     this.forceFullLabel = next ? '强开完整模式：已开' : '强开完整模式';
     this.forceFullColor = next ? '#30D158' : '#8E8E93';
     this.perfMode = next ? '完整(强制)' : (Layout.get().round || Layout.get().apiVersion <= 0 || Layout.get().apiVersion < 24) ? '受限' : '完整';
+  },
+
+  /* ---------------- v1.1.3 增强搜索开关 + API 连通性测试（信息页） ---------------- */
+
+  refreshAi() {
+    var that = this;
+    Aicfg.load(function (cfg) {
+      var on = cfg.enabled === true;
+      that.aiOnBg = on ? '#2D6CFF' : '#1C1C1E';
+      that.aiOffBg = on ? '#1C1C1E' : '#2D6CFF';
+      that.aiOnFg = on ? '#FFFFFF' : '#8E8E93';
+      that.aiOffFg = on ? '#8E8E93' : '#FFFFFF';
+      that.aiKeyText = cfg.hasKey ? 'API Key 已设置 · 点此修改' : '点此设置 API Key';
+    });
+  },
+
+  onAi(on) {
+    var that = this;
+    if (on !== true) {
+      Aicfg.setEnabled(false, function () {
+        that.refreshAi();
+      });
+      return;
+    }
+    Aicfg.load(function (cfg) {
+      if (!cfg.hasKey) {
+        /* 没有 Key 先去设置；保存后自动回到首页（信息页可再开） */
+        Route.go('pages/ai/ai', { from: 'info' });
+        return;
+      }
+      Aicfg.setEnabled(true, function () {
+        that.refreshAi();
+      });
+    });
+  },
+
+  onOpenAiKey() {
+    Route.go('pages/ai/ai', { from: 'info' });
+  },
+
+  /* API 连通性测试：对 DeepSeek Search 发一次极小请求，按结果区分网络/Key/余额 */
+  onTestApi() {
+    var that = this;
+    Aicfg.load(function (cfg) {
+      if (!cfg.hasKey) {
+        that.apiTestText = '请先设置 API Key';
+        that.apiTestColor = '#FF9F0A';
+        return;
+      }
+      that.apiTestText = '测试中…';
+      that.apiTestColor = '#8E8E93';
+      Aiclient.search('ping', cfg.key, function (err) {
+        if (!err) {
+          that.apiTestText = '连通正常 ✓';
+          that.apiTestColor = '#30D158';
+          return;
+        }
+        var e = String(err);
+        if (e.indexOf('401') >= 0 || e.indexOf('Key') >= 0) {
+          that.apiTestText = 'API Key 无效';
+          that.apiTestColor = '#FF453A';
+        } else if (e.indexOf('402') >= 0 || e.indexOf('余额') >= 0) {
+          that.apiTestText = '余额不足';
+          that.apiTestColor = '#FF453A';
+        } else if (e.indexOf('网络') >= 0 || e.indexOf('超时') >= 0 || e.indexOf('连接') >= 0) {
+          that.apiTestText = '网络不通';
+          that.apiTestColor = '#FF453A';
+        } else {
+          that.apiTestText = '测试失败';
+          that.apiTestColor = '#FF453A';
+        }
+      }, { timeoutMs: 15000 });
+    });
   },
 
   /* v1.0.8 清除全部数据（崩溃修复用）：二次确认 */
@@ -219,16 +300,14 @@ export default {
     } else if (index === 1) {
       Route.go('pages/novel/novel', {});
     } else if (index === 2) {
-      Route.go('pages/ai/ai', {});
-    } else if (index === 3) {
       Route.go('pages/rss/rss', {});
-    } else if (index === 4) {
+    } else if (index === 3) {
       Route.go(SHELF_PAGE, { tab: 'bookmark' });
-    } else if (index === 5) {
+    } else if (index === 4) {
       Route.go(SHELF_PAGE, { tab: 'history' });
-    } else if (index === 6) {
+    } else if (index === 5) {
       Route.go(OFFLINE_PAGE, {});
-    } else if (index === 7) {
+    } else if (index === 6) {
       Route.go(READER_PAGE, { url: Txt.TEST_URL });
     }
   },
@@ -391,3 +470,5 @@ export default {
     }
   }
 };
+
+

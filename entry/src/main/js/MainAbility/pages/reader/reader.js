@@ -19,6 +19,9 @@ import Sway from '../../common/sway.js';
 import PageStore from '../../common/pagestore.js';
 import Sched from '../../common/scheduler.js';
 import Aistore from '../../common/aistore.js';
+import Aicfg from '../../common/aicfg.js';
+import Aiclient from '../../common/aiclient.js';
+import Md from '../../common/md.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var TXT_SAVE = '收藏';
@@ -40,7 +43,8 @@ var FAIL_TEXT = {
   toolarge: ['页面内容过大', '该页面超出手表处理能力，请换更轻量的站点'],
   toc: ['无法打开整本目录', '目录页数百 KB 超出内存，请用阅读页「目录」按钮浏览章节'],
   'offline-miss': ['离线内容已失效', '请返回离线列表并重新保存该网页'],
-  'ai-miss': ['AI 正文已失效', '请返回增强搜索重新抓取该网页']
+  'ai-miss': ['AI 正文已失效', '请返回增强搜索重新抓取该网页'],
+  'ai-fail': ['增强解析失败', '已开启增强搜索，请检查 API Key 或稍后重试']
 };
 
 function toast(message) {
@@ -299,6 +303,19 @@ export default {
   netFetch(url) {
     Layout.syncConfig();
     var that = this;
+    /* v1.1.3：设置页开启增强搜索后，网页正文统一由 DeepSeek Fetch 返回
+       纯文本，不再走 @system.fetch + Html.parse；关闭时保持原 HTML 解析链。 */
+    Aicfg.load(function (cfg) {
+      if (cfg.enabled && cfg.hasKey) {
+        that.aiFetch(url, cfg.key);
+        return;
+      }
+      that.normalFetch(url);
+    });
+  },
+
+  normalFetch(url) {
+    var that = this;
     /* 响应上限 = 当前屏幕/性能档位的解析窗口（Layout.net().maxHtml）：
        解析器本来就只消费前 48K 字符，大站 100K+ 字符的响应多出来的部分是
        纯堆负担（创世 115K 响应里正文只占前 31K）。截断后瞬时峰值从 ~240K
@@ -311,6 +328,50 @@ export default {
         that.onFail(reason);
       }
     }, { maxChars: Layout.net().parseWindowChars });
+  },
+
+  aiFetch(url, key) {
+    var that = this;
+    Aiclient.fetchPage(url, key, function (err, page) {
+      if (err) {
+        toast(err);
+        that.onFail('ai-fail');
+        return;
+      }
+      var text = Md.toText(page.content || '');
+      if (!text || text.length < Config.MIN_TEXT_CHARS) {
+        that.onFail('unsupported');
+        return;
+      }
+      var max = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
+      var truncated = false;
+      if (text.length > max) {
+        text = text.substring(0, max);
+        truncated = true;
+      }
+      that.stopSpinner();
+      that.stopLoadMeter();
+      var doc = {
+        url: url,
+        title: page.title || Url.displayOf(url),
+        text: text,
+        links: [],
+        nextHref: '',
+        prevHref: '',
+        startHref: '',
+        chapters: [],
+        truncated: truncated,
+        kind: 'text',
+        ai: true,
+        status: 'ok',
+        failReason: '',
+        fetchedAt: Date.now()
+      };
+      that.install(doc, 0, that.restoreOffset || 0);
+      if (truncated) {
+        toast('网页较长，已截断显示');
+      }
+    }, { timeoutMs: Layout.net().slow ? 90000 : 60000 });
   },
 
   onBody(text) {

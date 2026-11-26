@@ -18,6 +18,8 @@ import Store from '../../common/store.js';
 import Crown from '../../common/crown.js';
 import Sway from '../../common/sway.js';
 import Layout from '../../common/layout.js';
+import Aicfg from '../../common/aicfg.js';
+import Aiclient from '../../common/aiclient.js';
 
 var READER_PAGE = 'pages/reader/reader';
 var STAR_LINE = '/common/star_line.png';
@@ -139,7 +141,49 @@ export default {
     this.startSpin();
 
     /* 单请求取 10 条。注意不能并发多个 fetchText：common/net.js 的序号令牌
-       会把前一个未完成请求的回调静默丢弃（1.5.0 卡「正在搜索」的根因）。 */
+       会把前一个未完成请求的回调静默丢弃（1.5.0 卡「正在搜索」的根因）。
+       v1.1.3：增强搜索开启时改用 DeepSeek Search；关闭时保留 Bing RSS。 */
+    var that = this;
+    Aicfg.load(function (cfg) {
+      if (cfg.enabled && cfg.hasKey) {
+        that.aiSearch(q, cfg.key);
+      } else {
+        that.bingSearch(q);
+      }
+    });
+  },
+
+  aiSearch(q, key) {
+    var that = this;
+    Aiclient.search(q, key, function (err, list) {
+      if (err) {
+        that.onFail('unreachable');
+        return;
+      }
+      var items = [];
+      for (var i = 0; i < list.length; i += 1) {
+        var it = list[i];
+        items.push({
+          title: it.title || it.url,
+          sub: it.siteName ? ('DeepSeek · ' + it.siteName) : 'DeepSeek',
+          summary: it.summary || it.snippet || '',
+          url: it.url
+        });
+      }
+      if (items.length === 0) {
+        that.stopSpin();
+        that.isLoading = false;
+        that.hasResults = false;
+        that.isFailed = false;
+        that.emptyTitle = '没有找到「' + q + '」相关结果';
+        Fade.fadeIn(that);
+        return;
+      }
+      that.showResults(items, q);
+    }, { timeoutMs: Layout.net().slow ? 60000 : 30000 });
+  },
+
+  bingSearch(q) {
     var that = this;
     Net.fetchText(Search.buildUrl(q), {
       onSuccess: function (text) {

@@ -157,7 +157,6 @@ function toText(markdown) {
   var lines = raw.split('\n');
   var out = [];
   var inCode = false;
-  var blank = false;
   for (var i = 0; i < lines.length; i += 1) {
     var line = lines[i];
     var trimmed = String(line || '').trim();
@@ -165,29 +164,18 @@ function toText(markdown) {
       inCode = !inCode;
       continue;
     }
-    if (inCode) {
-      out.push(String(line || '').split('\t').join('  '));
+    /* v1.1.3：阅读结果不再保留空行，避免 AI Fetch/搜索摘要出现整屏空段。 */
+    if (!trimmed) {
       continue;
     }
-    if (!trimmed) {
-      if (!blank) {
-        out.push('');
-        blank = true;
-      }
+    if (inCode) {
+      out.push(String(line || '').split('\t').join('  '));
       continue;
     }
     var cleaned = stripInline(stripMarkers(trimmed)).trim();
     if (cleaned) {
       out.push(cleaned);
-      blank = false;
     }
-  }
-  /* 去首尾空行 */
-  while (out.length > 0 && out[0] === '') {
-    out.shift();
-  }
-  while (out.length > 0 && out[out.length - 1] === '') {
-    out.pop();
   }
   return out.join('\n');
 }

@@ -20,8 +20,8 @@
 | 本地存储 | `@system.file` 单文件数据集（store v3.4：bm/hs/pf.txt，3900B 自截断）；`fsutil` 全局 FIFO 串行 + 16ms 调用间隔；离线正文 `saved.js`（UTF-8 字节双层分片、单次保存 ≤6 次调用）；P3 章文件 `internal://app/read/<key>.txt/.idx`（仅完整档）；AI 正文 `internal://app/ai/` 分片（空终止片，首写不再清理 24 个旧片）；API Key 用 `@system.storage` 持久化；网页缓存已删除（v3.3） |
 | 小说站导航 | `common/navrule.js` + `html.js` 提取 `startHref`（「开始阅读」类）与 `chapters`（「第x章」类，≤40 条、章节优先）；reader 书名/目录页给「开始阅读 ›」「目录」直达控件；「上一章/下一章」走原有 NEXT/PREV 词表；links 页章节置顶 |
 | 构建产物 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（58 条目，0 PNG）与同名 `.app`（3 条目） |
-| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（520,496 B）与同名 `.app`（509,006 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
-| SHA256 | hap `7F17D59FDA01132C032CC7BCCB8B5F2E7BA601664D30B122EBB73FD863637A08`<br>app `86016B9847B9A76F93366E977B7B07E0485E0126154F75300FD1A3C6FFCB7B93` |
+| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（534,505 B）与同名 `.app`（523,113 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
+| SHA256 | hap `0D0FD5CFD53FEA78644AC8546C305499A4E0CC32783BC66F22FB87513CC7DEEC`<br>app `1FA01B2D4DA8E0769A07C3D2106367E3DC99C88A28AABE2D042911AC496933A8` |
 | 签名 | `build-profile.json5` 已配置手动签名 `signingConfigs`（fit5pro.p12 / .cer / .p7b，SHA256withECDSA），**未绑定 product**，命令行只出未签名包；真机安装须用 **bin 格式 HAP**（见五之三十七） |
 | 档位 | compile `26.0.0` / target `5.0.0(12)` / compatible `4.0.0(10)` / minPlatformVersion 10 |
 
@@ -615,8 +615,8 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 ### 1. 功能
 
-- **增强搜索**：首页第 3 项「增强搜索」→ 首次进入设置 DeepSeek API Key（`@system.storage`，key `lwb_ai_key` / `lwb_ai_on`，单值 <128B）→ 输入关键词走 `POST /v1/tools/search`（8 条结果）或输入 `http(s)://` 走 `POST /v1/tools/fetch`（Markdown 正文）→ `common/md.js` 转纯文本 → `common/aistore.js` 分片落盘 → `reader` 本地纯文本阅读。Key 不写源码、不进日志、不进 Git；设置页可清除。**输入兼容**：系统安全键盘没有 `-` 键时，直接输入 `sk` 后面的正文即可，保存时自动补 `sk-`；也兼容 `sk正文`、`SK-正文`、全角破折号和空格/换行。
-- **RSS 新闻**：首页第 4 项「RSS 新闻」→ 5 个公共源（少数派/Solidot/InfoQ/博客园/开源中国）→ 列表/频道/详情三视图；RSS 2.0 + Atom 解析在 `common/rss.js`，源配置在 `common/rsscfg.js`；频道索引用 storage `lwb_rss_src` 持久化；详情可跳阅读页看原文。
+- **增强搜索**：首页**信息页**（右滑到「关于」）的开/关按钮，可随时切换；**关闭不清除 API Key，重新开启无需重输**（`@system.storage`，key `lwb_ai_key` / `lwb_ai_on`）。信息页还含 **API Key** 设置入口与 **API 连通性测试**（区分连通正常/Key 无效/余额不足/网络不通）。开启后**所有网页正文走 DeepSeek Fetch 纯文本**（不解析 HTML）、网页搜索走 Search；关闭则回退 HTML 解析/Bing。关键词走 `POST /v1/tools/search`（8 条），网址走 `POST /v1/tools/fetch`（Markdown）→ `common/md.js` 转纯文本（消空行）→ `common/aistore.js` 分片落盘 → `reader` 纯文本阅读。Key 不写源码、不进日志、不进 Git；仅 Key 设置页「清除」可删。**输入兼容**：安全键盘无 `-` 时输入 `sk` 后正文自动补 `sk-`。
+- **RSS 新闻**：首页第 4 项「RSS 新闻」→ 5 个公共源（少数派/Solidot/InfoQ/博客园/开源中国）→ 列表/频道/详情三视图；RSS 2.0 + Atom 解析在 `common/rss.js`，源配置在 `common/rsscfg.js`；频道索引用 storage `lwb_rss_src` 持久化；详情可跳阅读页看原文。 **RSS 移除顶部遮罩**（真机反馈压住列表首条），方屏/圆屏均去上遮罩。
 - **新图标**：`ic_novel.png`（书本+星）、`ic_ai.png`（页面+四角星）、`ic_rss.png`（点+三段弧）；小说搜索不再复用书签图标。
 - **BIN-only**：`pack-app.ps1` 默认删除所有 `.png/.jpg/.jpeg/.bmp` 条目，只保留 DevEco 生成的 `.png.bin`；应用图标 `icon.png/icon_small.png` 也改为 `icon.bin/icon_small.bin`，并等长改写 `resources.index` 路径。
 - **文件 API 加固**：`fsutil.splitText` UTF-8 3600B 双层分片、`readSmall` 返回 `ok/code`、store 迁移“写成功再删旧”、saved 清单读失败不覆盖、AI 空终止片、`ensureDir` 错误码、`route.setCurrent` 长 URL 写成功再清 storage。详见 `docs/FILE-API-REVIEW-v1.1.2.md`。
@@ -629,15 +629,15 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 ### 3. 构建与产物
 
-- `pwsh -File tools/build.ps1`：冒烟（147 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
+- `pwsh -File tools/build.ps1`：冒烟（148 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
 - 当前未签名产物（2026-11-26 17:50 构建）：
-  - HAP `520,496 B`，58 条目，0 PNG，SHA256 `7F17D59FDA01132C032CC7BCCB8B5F2E7BA601664D30B122EBB73FD863637A08`；
-  - APP `509,006 B`，SHA256 `86016B9847B9A76F93366E977B7B07E0485E0126154F75300FD1A3C6FFCB7B93`。
+  - HAP `534,505 B`，58 条目，0 PNG，SHA256 `0D0FD5CFD53FEA78644AC8546C305499A4E0CC32783BC66F22FB87513CC7DEEC`；
+  - APP `523,113 B`，SHA256 `1FA01B2D4DA8E0769A07C3D2106367E3DC99C88A28AABE2D042911AC496933A8`。
 - 构建时 `index.js`、`reader.js`、`ai.js`、`search.js`、`rss.js` 等页面快照可能缺失（jerry-snapshot 64KB 堆），运行会退回解析 `.js`，功能不受影响；页面 JS 均 <112KB。
 
 ### 4. 验证边界
 
-- 已执行：147/147 冒烟、release 构建、HAP 0 PNG/双端页面/JS 体积检查、RSS 真实源 PC 解析（5 源均出条目）、DeepSeek Search/Fetch 直连实测。
+- 已执行：148/148 冒烟、release 构建、HAP 0 PNG/双端页面/JS 体积检查、RSS 真实源 PC 解析（5 源均出条目）、DeepSeek Search/Fetch 直连实测。
 - 未执行：FIT 5 Pro / GT 真机上的 API Key 持久化、AI 交互与超时、RSS 5 源手表网络、文件 API 字节语义、应用图标 `.bin` 启动器兼容性。
 - Lite Simulator：直启窗口黑屏，但通过 `Simulator.exe -lws <port>` 的 WebSocket 二进制帧已抓取首页/增强搜索/RSS 的 408×480 与 466×466 init 渲染截图（`交付-轻鸿浏览器-v1.1.2\证据-模拟器-*.png`）；`onShow`、点击、定时器不派发，不能作为文件 API/图片释放证据。
 - 发布前必须补：签名 HAP 真机安装、首次/二次启动、Key 清除重填、AI 超时/402/429、RSS 源逐项、`internal://app/` 写入/读取/迁移、图片释放。
@@ -718,6 +718,8 @@ pwsh -File tools\pack-app.ps1
 - `docs/install.md`：安装流程与签名命令（部分历史结论已过时，见第六节第 4 条）
 - `spec/lite-web-reader/{spec,plan,tasks}.md`：需求/设计/任务（Phase 1~9 全部完成）
 - 技能规范：`memory-and-runtime.md`（性能基线 + JS 体积边界）、`device-compatibility.md`（FIT 5 Pro 实测档案）
+
+
 
 
 

@@ -2253,12 +2253,12 @@ function runMarkdownCases() {
 
   test('strips headings, links and images', function () {
     const text = Md.toText('# 标题\n\n[链接文字](https://example.com)\n\n![图片](https://x/a.png)\n\n**加粗**');
-    eq(text, '标题\n\n链接文字\n\n加粗');
+    eq(text, '标题\n链接文字\n加粗');
   });
 
   test('strips code fences but keeps code text', function () {
     const text = Md.toText('```\nvar a = 1;\n```\n\n正文');
-    eq(text, 'var a = 1;\n\n正文');
+    eq(text, 'var a = 1;\n正文');
   });
 
   test('decodes entities', function () {
@@ -2287,6 +2287,20 @@ function runAiConfigCases() {
       eq(cfg.hasKey, true);
       eq(cfg.enabled, true);
       eq(cfg.key, 'sk-test-123456');
+    });
+  });
+  test('toggle off keeps the API key; toggle back on needs no re-entry', function () {
+    Cfg.saveKey('sk-keep-123456', function () {});
+    Cfg.setEnabled(false, function () {});
+    Cfg.load(function (cfg) {
+      eq(cfg.hasKey, true, 'turning off must not clear the key');
+      eq(cfg.enabled, false, 'off state');
+    });
+    Cfg.setEnabled(true, function () {});
+    Cfg.load(function (cfg) {
+      eq(cfg.hasKey, true, 'key still present after re-enable');
+      eq(cfg.key, 'sk-keep-123456', 'key unchanged');
+      eq(cfg.enabled, true, 're-enabled without re-entry');
     });
   });
   test('rejects empty key', function () {
@@ -2332,4 +2346,5 @@ function main() {
 }
 
 main();
+
 

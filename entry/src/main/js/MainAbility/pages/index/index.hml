@@ -82,6 +82,32 @@
                             <text class="rd-card-value">{{perfMode}}</text>
                         </stack>
                     </list-item>
+                    <!-- v1.1.3 增强搜索总开关 + API Key + 连通性测试 -->
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-ai-toggle-label">增强搜索</text>
+                            <div class="rd-ai-opts">
+                                <div class="rd-ai-opt" style="background-color: {{aiOnBg}};" onclick="onAi(true)">
+                                    <text class="rd-ai-opt-txt" style="color: {{aiOnFg}};">开</text>
+                                </div>
+                                <div class="rd-ai-opt" style="background-color: {{aiOffBg}};" onclick="onAi(false)">
+                                    <text class="rd-ai-opt-txt" style="color: {{aiOffFg}};">关</text>
+                                </div>
+                            </div>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item" onclick="onOpenAiKey">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">API Key</text>
+                            <text class="rd-card-value">{{aiKeyText}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item" onclick="onTestApi">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">API 连通性</text>
+                            <text class="rd-card-value" style="color: {{apiTestColor}};">{{apiTestText}}</text>
+                        </stack>
+                    </list-item>
                     <list-item class="rd-card-item" onclick="onToggleForceFull">
                         <stack class="rd-card">
                             <text class="rd-clear-label" style="color: {{forceFullColor}};">{{forceFullLabel}}</text>
@@ -199,6 +225,35 @@
                             <stack class="card">
                                 <text class="card-label">性能体验</text>
                                 <text class="card-value">{{perfMode}}</text>
+                            </stack>
+                        </list-item>
+
+                        <!-- v1.1.3 增强搜索总开关 + API Key + 连通性测试 -->
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="ai-toggle-label">增强搜索</text>
+                                <div class="ai-opts">
+                                    <div class="ai-opt" style="background-color: {{aiOnBg}};" onclick="onAi(true)">
+                                        <text class="ai-opt-txt" style="color: {{aiOnFg}};">开</text>
+                                    </div>
+                                    <div class="ai-opt" style="background-color: {{aiOffBg}};" onclick="onAi(false)">
+                                        <text class="ai-opt-txt" style="color: {{aiOffFg}};">关</text>
+                                    </div>
+                                </div>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item" onclick="onOpenAiKey">
+                            <stack class="card">
+                                <text class="card-label">API Key</text>
+                                <text class="card-value">{{aiKeyText}}</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item" onclick="onTestApi">
+                            <stack class="card">
+                                <text class="card-label">API 连通性</text>
+                                <text class="card-value" style="color: {{apiTestColor}};">{{apiTestText}}</text>
                             </stack>
                         </list-item>
 
