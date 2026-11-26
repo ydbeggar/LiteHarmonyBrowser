@@ -91,6 +91,6 @@
         </stack>
     </stack>
 
-    <image class="shader-top" style="width: {{g.shaderTopW}}px; top: {{g.shaderTopY}}px;" src="/common/shader_top.png"></image>
+    <!-- RSS 页不使用上遮罩：顶部遮罩会压住列表首条/滚动内容，v1.1.2 按真机反馈移除 -->
     <image class="shader" style="width: {{g.shaderW}}px; top: {{g.shaderY}}px;" src="/common/shader.png"></image>
 </stack>

@@ -31,7 +31,7 @@
                 <image class="hdr-back" src="/common/ic_back.png"></image>
             </div>
             <text class="hdr-title">增强搜索</text>
-            <div class="hdr-btn hdr-btn-action" onclick="onClearKey">
+            <div class="hdr-btn hdr-btn-action" onclick="onOpenKeySetup">
                 <text class="hdr-action">设置</text>
             </div>
         </div>
@@ -40,7 +40,7 @@
             <div class="bar" style="height: {{g.barH}}px;">
                 <input class="bar-input" type="text" placeholder="网址或关键词" onchange="onQueryChange" />
                 <div class="bar-btn" onclick="onReadUrl">
-                    <text class="bar-btn-txt">读网页</text>
+                    <text class="bar-btn-txt">搜网页</text>
                 </div>
                 <div class="bar-btn" onclick="onSearch">
                     <text class="bar-btn-txt">搜索</text>

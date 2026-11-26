@@ -17,6 +17,7 @@ import Aistore from '../../common/aistore.js';
 import Md from '../../common/md.js';
 import Gesture from '../../common/gesture.js';
 import Crown from '../../common/crown.js';
+import Search from '../../common/search.js';
 
 var READER_PAGE = 'pages/reader/reader';
 
@@ -100,6 +101,13 @@ export default {
   onSaveKey() {
     var key = String(this.keyInput || '').trim();
     if (!key) {
+      /* v1.1.3 修复：空输入不清空已保存的 Key，仅返回搜索界面 */
+      if (this.keyConfigured) {
+        this.isSetup = false;
+        this.isSearch = true;
+        this.isFailed = false;
+        return;
+      }
       this.failTitle = '请输入 API Key';
       this.failSub = 'Key 只保存在手表本地';
       this.isFailed = true;
@@ -121,6 +129,20 @@ export default {
       that.isSearch = true;
       that.isFailed = false;
       that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
+    });
+  },
+
+  /* v1.1.3 修复：进入 Key 设置界面但不清空已保存的 Key */
+  onOpenKeySetup() {
+    var that = this;
+    Aicfg.load(function (cfg) {
+      that._key = cfg.key || '';
+      that.keyConfigured = cfg.hasKey;
+      that.keyMasked = Aicfg.mask(cfg.key);
+      that.keyInput = '';
+      that.isFailed = false;
+      that.isSetup = true;
+      that.isSearch = false;
     });
   },
 
@@ -156,14 +178,15 @@ export default {
     setTimeout(function () {
       var q = String(that.query || '').trim();
       if (!q) {
-        that.showFail('请输入网址或关键词', '网址以 http(s):// 开头');
+        that.showFail('请输入网址', '网址以 http(s):// 开头');
         return;
       }
-      if (q.indexOf('http://') === 0 || q.indexOf('https://') === 0) {
-        that.fetchPage(q);
-      } else {
-        that.search(q);
+      /* 「搜网页」：直接用 DeepSeek Fetch 拉取网页正文 */
+      var url = q;
+      if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+        url = 'https://' + url;
       }
+      that.fetchPage(url);
     }, 80);
   },
 
@@ -184,24 +207,40 @@ export default {
     this.isLoading = true;
     this.hasResults = false;
     this.isFailed = false;
-    this.loadingText = 'DeepSeek 正在搜索…';
+    this.loadingText = '正在搜索…';
     this.startWait();
-    Aiclient.search(q, this.getKey(), function (err, list) {
-      that.stopWait();
-      that.isLoading = false;
-      if (err) {
-        that.showFail('搜索失败', err);
-        return;
+    /* 「搜索」：用 Bing RSS 返回结果（同主页网页搜索）；打开结果时才走 DeepSeek Fetch */
+    Net.fetchText(Search.buildUrl(q), {
+      onSuccess: function (text) {
+        that.stopWait();
+        that.isLoading = false;
+        var r = Search.parse(text);
+        if (r.kind === 'error' || !r.items || r.items.length < 1) {
+          that.showFail('没有找到相关结果', '换个关键词试试');
+          return;
+        }
+        var items = [];
+        for (var i = 0; i < r.items.length; i += 1) {
+          var it = r.items[i];
+          items.push({
+            title: it.title || it.url,
+            siteName: it.sub || '',
+            date: '',
+            snippet: it.summary || it.sub || '',
+            url: it.url || ''
+          });
+        }
+        that.items = items;
+        that.hasResults = true;
+        that.isFailed = false;
+        Crown.applyLater(that, [['aiList', true]]);
+      },
+      onFail: function (reason) {
+        that.stopWait();
+        that.isLoading = false;
+        that.showFail('搜索失败', reason === 'timeout' ? '网络超时' : '无法连接搜索服务');
       }
-      if (!list || list.length < 1) {
-        that.showFail('没有找到相关结果', '换个关键词试试');
-        return;
-      }
-      that.items = list;
-      that.hasResults = true;
-      that.isFailed = false;
-      Crown.applyLater(that, [['aiList', true]]);
-    }, { timeoutMs: Layout.net().slow ? 60000 : 30000 });
+    }, { maxChars: 15000 });
   },
 
   fetchPage(url) {

@@ -91,7 +91,7 @@
         </stack>
     </stack>
 
-    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <!-- RSS 页不使用上遮罩：顶部遮罩会压住列表首条/滚动内容，v1.1.2 按真机反馈移除 -->
     <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
 </stack>
 
