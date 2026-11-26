@@ -20,8 +20,8 @@
 | 本地存储 | `@system.file` 单文件数据集（store v3.4：bm/hs/pf.txt，3900B 自截断）；`fsutil` 全局 FIFO 串行 + 16ms 调用间隔；离线正文 `saved.js`（UTF-8 字节双层分片、单次保存 ≤6 次调用）；P3 章文件 `internal://app/read/<key>.txt/.idx`（仅完整档）；AI 正文 `internal://app/ai/` 分片（空终止片，首写不再清理 24 个旧片）；API Key 用 `@system.storage` 持久化；网页缓存已删除（v3.3） |
 | 小说站导航 | `common/navrule.js` + `html.js` 提取 `startHref`（「开始阅读」类）与 `chapters`（「第x章」类，≤40 条、章节优先）；reader 书名/目录页给「开始阅读 ›」「目录」直达控件；「上一章/下一章」走原有 NEXT/PREV 词表；links 页章节置顶 |
 | 构建产物 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（58 条目，0 PNG）与同名 `.app`（3 条目） |
-| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（520,050 B）与同名 `.app`（508,590 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
-| SHA256 | hap `E9FF5E8E184850A6D3AA91325B9D7889630A437A34E511A21E67DF8EF0DE8543`<br>app `4A4BB5D4E344C63874502CC011408FB9B02B6E3B393755E4B8B6CB0DF1385E05` |
+| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（520,496 B）与同名 `.app`（509,006 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
+| SHA256 | hap `7F17D59FDA01132C032CC7BCCB8B5F2E7BA601664D30B122EBB73FD863637A08`<br>app `86016B9847B9A76F93366E977B7B07E0485E0126154F75300FD1A3C6FFCB7B93` |
 | 签名 | `build-profile.json5` 已配置手动签名 `signingConfigs`（fit5pro.p12 / .cer / .p7b，SHA256withECDSA），**未绑定 product**，命令行只出未签名包；真机安装须用 **bin 格式 HAP**（见五之三十七） |
 | 档位 | compile `26.0.0` / target `5.0.0(12)` / compatible `4.0.0(10)` / minPlatformVersion 10 |
 
@@ -615,7 +615,7 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 ### 1. 功能
 
-- **增强搜索**：首页第 3 项「增强搜索」→ 首次进入设置 DeepSeek API Key（`@system.storage`，key `lwb_ai_key` / `lwb_ai_on`，单值 <128B）→ 输入关键词走 `POST /v1/tools/search`（8 条结果）或输入 `http(s)://` 走 `POST /v1/tools/fetch`（Markdown 正文）→ `common/md.js` 转纯文本 → `common/aistore.js` 分片落盘 → `reader` 本地纯文本阅读。Key 不写源码、不进日志、不进 Git；设置页可清除。
+- **增强搜索**：首页第 3 项「增强搜索」→ 首次进入设置 DeepSeek API Key（`@system.storage`，key `lwb_ai_key` / `lwb_ai_on`，单值 <128B）→ 输入关键词走 `POST /v1/tools/search`（8 条结果）或输入 `http(s)://` 走 `POST /v1/tools/fetch`（Markdown 正文）→ `common/md.js` 转纯文本 → `common/aistore.js` 分片落盘 → `reader` 本地纯文本阅读。Key 不写源码、不进日志、不进 Git；设置页可清除。**输入兼容**：系统安全键盘没有 `-` 键时，直接输入 `sk` 后面的正文即可，保存时自动补 `sk-`；也兼容 `sk正文`、`SK-正文`、全角破折号和空格/换行。
 - **RSS 新闻**：首页第 4 项「RSS 新闻」→ 5 个公共源（少数派/Solidot/InfoQ/博客园/开源中国）→ 列表/频道/详情三视图；RSS 2.0 + Atom 解析在 `common/rss.js`，源配置在 `common/rsscfg.js`；频道索引用 storage `lwb_rss_src` 持久化；详情可跳阅读页看原文。
 - **新图标**：`ic_novel.png`（书本+星）、`ic_ai.png`（页面+四角星）、`ic_rss.png`（点+三段弧）；小说搜索不再复用书签图标。
 - **BIN-only**：`pack-app.ps1` 默认删除所有 `.png/.jpg/.jpeg/.bmp` 条目，只保留 DevEco 生成的 `.png.bin`；应用图标 `icon.png/icon_small.png` 也改为 `icon.bin/icon_small.bin`，并等长改写 `resources.index` 路径。
@@ -629,10 +629,10 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 ### 3. 构建与产物
 
-- `pwsh -File tools/build.ps1`：冒烟（146 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
-- 当前未签名产物（2026-11-26 17:23 构建）：
-  - HAP `520,050 B`，58 条目，0 PNG，SHA256 `E9FF5E8E184850A6D3AA91325B9D7889630A437A34E511A21E67DF8EF0DE8543`；
-  - APP `508,590 B`，SHA256 `4A4BB5D4E344C63874502CC011408FB9B02B6E3B393755E4B8B6CB0DF1385E05`。
+- `pwsh -File tools/build.ps1`：冒烟（147 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
+- 当前未签名产物（2026-11-26 17:50 构建）：
+  - HAP `520,496 B`，58 条目，0 PNG，SHA256 `7F17D59FDA01132C032CC7BCCB8B5F2E7BA601664D30B122EBB73FD863637A08`；
+  - APP `509,006 B`，SHA256 `86016B9847B9A76F93366E977B7B07E0485E0126154F75300FD1A3C6FFCB7B93`。
 - 构建时 `index.js`、`reader.js`、`ai.js`、`search.js`、`rss.js` 等页面快照可能缺失（jerry-snapshot 64KB 堆），运行会退回解析 `.js`，功能不受影响；页面 JS 均 <112KB。
 
 ### 4. 验证边界
@@ -718,6 +718,8 @@ pwsh -File tools\pack-app.ps1
 - `docs/install.md`：安装流程与签名命令（部分历史结论已过时，见第六节第 4 条）
 - `spec/lite-web-reader/{spec,plan,tasks}.md`：需求/设计/任务（Phase 1~9 全部完成）
 - 技能规范：`memory-and-runtime.md`（性能基线 + JS 体积边界）、`device-compatibility.md`（FIT 5 Pro 实测档案）
+
+
 
 
 

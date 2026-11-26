@@ -106,16 +106,16 @@ export default {
       return;
     }
     var that = this;
-    Aicfg.saveKey(key, function (ok, reason) {
+    Aicfg.saveKey(key, function (ok, reason, finalKey) {
       if (!ok) {
         that.failTitle = '保存失败';
         that.failSub = reason || '请重试';
         that.isFailed = true;
         return;
       }
-      that._key = key;
+      that._key = finalKey || Aicfg.normalizeKey(key);
       that.keyConfigured = true;
-      that.keyMasked = Aicfg.mask(key);
+      that.keyMasked = Aicfg.mask(that._key);
       that.keyInput = '';
       that.isSetup = false;
       that.isSearch = true;

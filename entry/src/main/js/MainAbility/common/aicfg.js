@@ -12,6 +12,55 @@ import storage from '@system.storage';
 var KEY_API = 'lwb_ai_key';
 var KEY_ON = 'lwb_ai_on';
 var MAX_KEY_LEN = 120;
+var MIN_KEY_LEN = 10;
+
+/**
+ * 把用户输入规范成 DeepSeek Key。
+ *
+ * 手表系统安全键盘没有“-”键，用户经常只能输入 sk 后面的正文，或者把
+ * “sk-”中的连字符漏掉。这里不要求用户输入前缀：
+ *   - 纯正文        -> sk-正文
+ *   - sk正文        -> sk-正文
+ *   - SK-正文       -> sk-正文
+ *   - 全角/长破折号 -> 半角 -
+ *   - 空格/换行/零宽字符自动去掉
+ */
+function normalizeKey(raw) {
+  var text = raw === null || raw === undefined ? '' : String(raw);
+  var s = '';
+  for (var i = 0; i < text.length; i += 1) {
+    var c = text.charAt(i);
+    var code = text.charCodeAt(i);
+    if (code === 32 || code === 9 || code === 10 || code === 13 || code === 0x3000 || code === 0x200b) {
+      continue;
+    }
+    if (code === 0xff0d || code === 0x2013 || code === 0x2014 || code === 0x2212) {
+      c = '-';
+    }
+    s += c;
+  }
+  if (!s) {
+    return '';
+  }
+  if (s.charAt(0) === '-') {
+    s = s.substring(1);
+  }
+  var lower = s.toLowerCase();
+  if (lower.indexOf('sk') === 0) {
+    s = 'sk' + s.substring(2);
+    if (s.length > 2 && s.charAt(2) !== '-') {
+      /* 少数输入法会把 “sk_” 当成分隔符；只在第 3 位处理。 */
+      if (s.charAt(2) === '_') {
+        s = 'sk-' + s.substring(3);
+      } else {
+        s = 'sk-' + s.substring(2);
+      }
+    }
+  } else {
+    s = 'sk-' + s;
+  }
+  return s === 'sk-' ? '' : s;
+}
 
 function getValue(key, cb) {
   var done = false;
@@ -80,12 +129,12 @@ function setValue(key, value, cb) {
 function load(cb) {
   getValue(KEY_API, function (key) {
     getValue(KEY_ON, function (on) {
-      var k = String(key || '').trim();
+      var k = normalizeKey(key);
       if (typeof cb === 'function') {
         cb({
           key: k,
-          enabled: String(on) === '1' && k.length > 0,
-          hasKey: k.length > 0
+          enabled: String(on) === '1' && k.length >= MIN_KEY_LEN,
+          hasKey: k.length >= MIN_KEY_LEN
         });
       }
     });
@@ -93,10 +142,10 @@ function load(cb) {
 }
 
 function saveKey(key, cb) {
-  var k = String(key || '').trim();
-  if (!k || k.length > MAX_KEY_LEN) {
+  var k = normalizeKey(key);
+  if (!k || k.length < MIN_KEY_LEN || k.length > MAX_KEY_LEN) {
     if (typeof cb === 'function') {
-      cb(false, '长度不合法');
+      cb(false, 'Key 长度不合法');
     }
     return;
   }
@@ -109,7 +158,7 @@ function saveKey(key, cb) {
     }
     setValue(KEY_ON, '1', function (onOk) {
       if (typeof cb === 'function') {
-        cb(onOk, onOk ? '' : '启用失败');
+        cb(onOk, onOk ? '' : '启用失败', k);
       }
     });
   });
@@ -134,7 +183,7 @@ function clear(cb) {
 }
 
 function mask(key) {
-  var k = String(key || '');
+  var k = normalizeKey(key);
   if (!k) {
     return '未设置';
   }
@@ -145,6 +194,7 @@ function mask(key) {
 }
 
 export default {
+  normalizeKey: normalizeKey,
   load: load,
   saveKey: saveKey,
   setEnabled: setEnabled,

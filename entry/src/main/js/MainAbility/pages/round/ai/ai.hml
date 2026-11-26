@@ -11,8 +11,8 @@
 
         <stack class="setup" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
             <text class="setup-title">启用 DeepSeek 增强搜索</text>
-            <text class="setup-hint">搜索或抓取网页正文，需要手动填写 DeepSeek API Key；Key 只保存在手表本地，不会写入代码或上传。</text>
-            <input class="key-input" type="password" placeholder="粘贴 DeepSeek API Key" onchange="onKeyChange" />
+            <text class="setup-hint">需要 DeepSeek API Key。键盘没有“-”也没关系：直接输入 sk 后面的内容，保存时自动补 sk-；Key 只保存在本地。</text>
+            <input class="key-input" type="password" placeholder="输入 sk 后面的内容（无需 -）" onchange="onKeyChange" />
             <div class="btn primary setup-btn" onclick="onSaveKey">
                 <text class="btn-txt">保存并启用</text>
             </div>

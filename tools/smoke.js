@@ -2273,6 +2273,12 @@ function runAiConfigCases() {
     eq(Cfg.mask('sk-1234567890abcdef'), 'sk-1****cdef');
     eq(Cfg.mask(''), '未设置');
   });
+  test('normalizes keys when the watch keyboard cannot type "-"', function () {
+    eq(Cfg.normalizeKey('abcdef1234567890'), 'sk-abcdef1234567890');
+    eq(Cfg.normalizeKey('skabcdef1234567890'), 'sk-abcdef1234567890');
+    eq(Cfg.normalizeKey('SK-abcdef1234567890'), 'sk-abcdef1234567890');
+    eq(Cfg.normalizeKey(' sk－abcdef1234567890 '), 'sk-abcdef1234567890');
+  });
   test('save/load round-trip through storage', function () {
     Cfg.saveKey('sk-test-123456', function (ok) {
       eq(ok, true);
@@ -2326,3 +2332,4 @@ function main() {
 }
 
 main();
+
