@@ -2,6 +2,7 @@
 
 > 本文件记录开发主线状态，**最后更新 2026-11-26**；最新变更见「五之四十」，当前主版本 **v1.1.1（1101）**（P2 流式解析 + P3 章文件分页 + 小说搜索 + GT 受限档回退；v1.0.4/1.0.5 已弃用）。
 > 2026-11-26 恢复档案（会话丢失后重建，含完整证据索引）：`内部恢复档案（不随仓库发布）`。
+> 2026-11-26 已初始化本地 Git 仓库（`main`，tag `v1.1.1`）；`dist/` 纳入版本库，`entry/build/`、`.hvigor/` 与含证书的 `build-profile.json5` 不入库。
 > 结论分两类并明确标注：**真机实测**（WATCH FIT 5 Pro）与**本机构建/脚本验证**。
 > 未经真机复验的新改动会单独标「待真机确认」。
 
@@ -598,7 +599,7 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 > 版本 **1.1.1（1101）**，关于页 `Release V1.1.1`，发布页时间 2026-11-09 12:12:08。
 > 冒烟 **133/133**；HAP 482,932 B（67 条目，`885B66FB…CC75F`）/ APP 468,480 B（3 条目，`71EDC3F5…5222`）。
-> 本机无 Git；v1.0.7 基线备份：`DevEcoStudioProjects\_backup_LiteHarmonyBrowser_v107_preP2P3_20261108-170419`。
+> 当时无 Git（2026-11-26 已初始化本地 Git：main / v1.1.1）；v1.0.7 基线备份：`DevEcoStudioProjects\_backup_LiteHarmonyBrowser_v107_preP2P3_20261108-170419`。
 
 1. **v1.0.8（内部，2026-11-08 21:47）**：新增 P1 网络双口径（`respCapBytes` 字节 / `parseWindowChars` 字符，`layout.js` + `net.js`）；新增 P2 `common/pagesink.js` 单遍流式分页、P3 `common/pagestore.js` 章文件+页表、`common/scheduler.js` 突发预算/内存闸门；新增 `pages/novel` 与 `pages/round/novel` 小说搜索（Bing RSS）；首页/关于页增加设备能力（屏幕形态/性能体验）、强开完整模式、清除全部数据；`store` 增加 `forceFull`。HAP 63→67 条目。
 2. **v1.0.9（内部，2026-11-08 21:55）**：只改 `pages/novel/novel.js`，`onQueryChange` 兼容 Lite `input change` 的三种回调形态（字符串 / `{value}` / `{text}`），`onSearch` 延迟 80ms 读取。
