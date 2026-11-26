@@ -16,7 +16,7 @@
 
 ## 二、下载
 
-每个版本的**未签名 `.app`** 可在仓库的 [Releases](https://github.com/ydbeggar/LiteHarmonyBrowser/releases) 页面下载，文件名形如 `LiteHarmonyBrowser-v1.1.2-unsigned-final.app`。
+每个版本的**未签名 `.app`** 可在仓库的 [Releases](https://github.com/ydbeggar/LiteHarmonyBrowser/releases) 页面下载。由于 GitHub 不允许直接上传 `.app` 扩展名，附件以 zip 封装，文件名形如 `LiteHarmonyBrowser-v1.1.2-unsigned-final.app.zip`，解压后得到同名 `.app`。
 
 未签名包需使用 DevEco Studio 配置本机签名后再安装或上架；仓库内 `dist/unsigned/` 同时保留了历史未签名 `.hap` / `.app`。
 
