@@ -1,0 +1,31 @@
+# ===== HarmonyOS / DevEco 构建产物（体积大，可重新生成） =====
+/entry/build/
+/.hvigor/
+/.cache/
+**/.preview/
+**/oh_modules/
+**/node_modules/
+
+# ===== IDE 本地配置 =====
+/.idea/
+*.iml
+
+# ===== 本机签名/凭据（不要提交到 Git） =====
+/build-profile.json5
+/build-profile.json5.bak
+*.p12
+*.p7b
+*.cer
+*.jks
+*.keystore
+local.properties
+
+# ===== 根目录构建/审计日志（历史留档，不纳入版本库） =====
+/_build_*.log
+/_audit_*.log
+/_smoke_*.log
+
+# ===== 操作系统 =====
+Thumbs.db
+desktop.ini
+.DS_Store

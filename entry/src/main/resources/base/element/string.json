@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "MainAbility_desc",
+      "value": "轻鸿浏览器"
+    },
+    {
+      "name": "MainAbility_label",
+      "value": "轻鸿浏览器"
+    },
+    {
+      "name": "app_name",
+      "value": "轻鸿浏览器"
+    },
+    {
+      "name": "app_desc",
+      "value": "轻鸿浏览器"
+    },
+    {
+      "name": "reqPermissions",
+      "value": "访问网络"
+    }
+  ]
+}

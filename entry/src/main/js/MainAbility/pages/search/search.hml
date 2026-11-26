@@ -1,0 +1,106 @@
+<stack class="root" style="width: {{g.w}}px; height: {{g.h}}px;" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <stack class="view" style="width: {{g.w}}px; height: {{g.h}}px;" if="{{isDetail}}">
+        <div class="hdr s-hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onHdrBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">{{headerTitle}}</text>
+            <div class="hdr-btn" onclick="onStar">
+                <image class="star-ic" src="{{starIcon}}"></image>
+            </div>
+        </div>
+
+        <stack class="s-detail" style="left: {{g.detailX}}px; top: {{g.detailY}}px; height: {{g.detailH}}px;">
+            <text class="d-title s-title" style="height: {{g.dTitleH}}px;">{{current.title}}</text>
+            <text class="d-sub s-sub" style="top: {{g.dSubY}}px; height: {{g.dSubH}}px;">{{current.sub}}</text>
+            <list class="d-sum-list" style="top: {{g.dSumY}}px; height: {{g.dSumH}}px;" ref="sumList" id="sumList" rotationvibrate="true">
+                <list-item class="d-sum-item" style="height: {{sumItemHeight}}px;">
+                    <text class="d-summary" style="height: {{sumHeight}}px;">{{current.summary}}</text>
+                </list-item>
+            </list>
+            <text class="d-url s-url" style="top: {{g.dUrlY}}px; height: {{g.dUrlH}}px;">{{current.url}}</text>
+            <div class="d-foot s-foot" style="top: {{g.dFootY}}px; height: {{g.dFootH}}px;">
+                <div class="btn primary" style="height: {{g.btnH}}px;" onclick="onVisit">
+                    <text class="btn-txt">访问</text>
+                </div>
+                <div class="btn" style="height: {{g.btnH}}px;" onclick="onBackToList">
+                    <text class="btn-txt">返回</text>
+                </div>
+            </div>
+        </stack>
+    </stack>
+
+    <stack class="view" style="width: {{g.w}}px; height: {{g.h}}px;" elif="{{isList}}">
+        <div class="hdr s-hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+            <div class="hdr-btn" onclick="onHdrBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">{{headerTitle}}</text>
+            <div class="hdr-btn hdr-btn-flat"></div>
+        </div>
+
+        <stack class="s-list" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+            <div class="bar s-bar" style="height: {{g.barH}}px;">
+                <input class="bar-input" type="text" placeholder="输入关键词"
+                       onchange="onQueryChange" />
+                <div class="bar-btn" onclick="onSearch">
+                    <text class="bar-btn-txt">搜索</text>
+                </div>
+            </div>
+
+            <stack class="area" style="top: {{g.areaY}}px; height: {{g.areaH}}px;">
+                <div class="state lwb-in" style="height: {{g.stateH}}px;" if="{{isLoading}}">
+                    <stack class="spin-box">
+                        <stack class="sway" style="left: {{swayLeft}}px;">
+                            <image class="sway-img" src="/common/ic_search.png"></image>
+                        </stack>
+                    </stack>
+                    <text class="state-title">正在搜索…</text>
+                    <text class="state-sub">{{query}}</text>
+                </div>
+
+                <!-- v3.3：10 条结果一次入列，list 内上下滑动浏览（分页器已删）；
+                     引导留白 30px 让首条胶囊落在渐隐帘透明端之外，未滑动不被遮挡 -->
+                <list class="list" ref="resultList" id="resultList" rotationvibrate="true" elif="{{hasResults}}" style="opacity: {{fadeOpacity}}; height: {{g.stateH}}px;">
+                    <list-item class="spacer-item">
+                        <div class="spacer-box"></div>
+                    </list-item>
+                    <list-item class="item" style="height: {{g.itemH}}px;" for="{{(index, item) in items}}" tid="url">
+                        <stack class="item-inner" style="height: {{g.innerH}}px;" onclick="onOpen(index)">
+                            <text class="item-title">{{item.title}}</text>
+                            <text class="item-sub">{{item.sub}}</text>
+                            <text class="item-arrow">›</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="tail-item">
+                        <div class="tail-box"></div>
+                    </list-item>
+                </list>
+
+                <div class="state lwb-in" style="height: {{g.stateH}}px;" elif="{{isFailed}}">
+                    <text class="state-title">{{failTitle}}</text>
+                    <text class="state-sub">{{failSub}}</text>
+                    <div class="act-row">
+                        <div class="act-btn" onclick="onSearch">
+                            <text class="act-txt">重试</text>
+                        </div>
+                        <div class="act-btn ghost" onclick="onBack">
+                            <text class="act-txt">返回首页</text>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="state lwb-in" style="height: {{g.stateH}}px;" else>
+                    <text class="state-title">{{emptyTitle}}</text>
+                    <text class="state-sub">换个关键词试试</text>
+                </div>
+            </stack>
+        </stack>
+
+        <!-- 上下渐隐帘（与首页完全同款贴图与几何关系）：
+             顶部帘实心端贴搜索栏底缘 y=168 向下渐隐，滚动内容向上渐隐入栏底；
+             底部帘 408×48@436 不随内容滚动。 -->
+        <image class="shader-top" style="width: {{g.shaderTopW}}px; top: {{g.shaderTopY}}px;" src="/common/shader_top.png"></image>
+        <image class="shader" style="width: {{g.shaderW}}px; top: {{g.shaderY}}px;" src="/common/shader.png"></image>
+    </stack>
+</stack>

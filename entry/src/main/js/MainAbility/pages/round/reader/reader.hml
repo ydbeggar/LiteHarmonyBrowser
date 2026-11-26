@@ -1,0 +1,152 @@
+<stack class="rd-root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <stack class="rd-content">
+    <stack class="rd-state lwb-in" if="{{isLoading}}">
+        <stack class="rd-spin">
+            <stack class="rd-sway" style="left: {{swayLeft}}px;">
+                <image class="rd-sway-img" src="/common/ic_search.png"></image>
+            </stack>
+        </stack>
+        <text class="rd-state-title rd-load-title">正在加载正文…</text>
+        <text class="rd-state-sub rd-load-sub">{{loadingUrl}}</text>
+        <div class="rd-load-track">
+            <div class="rd-load-fill" style="width: {{loadBarW}}px;"></div>
+        </div>
+        <text class="rd-load-label">{{loadLabel}}</text>
+    </stack>
+
+    <stack class="rd-body" elif="{{isOk}}">
+        <stack class="rd-start lwb-in" if="{{showStart}}">
+            <text class="rd-tv-title">{{title}}</text>
+            <text class="rd-tv-intro">{{pageText}}</text>
+            <div class="rd-tv-btn rd-tv-btn-a rd-primary" onclick="onStartRead">
+                <text class="rd-tv-btn-txt">开始阅读 ›</text>
+            </div>
+            <div class="rd-tv-btn rd-tv-btn-b rd-ghost" onclick="onOpenLinks">
+                <text class="rd-tv-btn-txt2">目录</text>
+            </div>
+        </stack>
+
+        <stack class="rd-text-layer" else>
+            <text class="rd-text lwb-turn" if="{{layerB}}"
+                  style="font-size: {{fontSizePx}}px; line-height: {{lineHeightPx}}px;">{{pageTextB}}</text>
+            <text class="rd-text lwb-turn" else
+                  style="font-size: {{fontSizePx}}px; line-height: {{lineHeightPx}}px;">{{pageTextA}}</text>
+            <div class="rd-zone-top" onclick="onPrev"></div>
+            <div class="rd-zone-bottom" onclick="onNext"></div>
+            <stack class="rd-nav" if="{{showNav}}">
+                <div class="rd-nav-btn rd-nav-prev" if="{{hasPrev}}" onclick="onPrevChapter">
+                    <text class="rd-nav-btn-txt">‹ 上一章</text>
+                </div>
+                <div class="rd-nav-btn rd-nav-toc" onclick="onOpenLinks">
+                    <text class="rd-nav-btn-txt">目录</text>
+                </div>
+                <div class="rd-nav-btn rd-nav-next" if="{{hasNext}}" onclick="onNextChapter">
+                    <text class="rd-nav-btn-txt">下一章 ›</text>
+                </div>
+            </stack>
+        </stack>
+    </stack>
+
+    <stack class="rd-state lwb-in" elif="{{isEmpty}}">
+        <text class="rd-state-title">未识别到正文</text>
+        <text class="rd-state-sub">该页面可能以图片或脚本渲染，可尝试查看链接列表</text>
+        <div class="rd-act-row">
+            <div class="rd-act-btn" onclick="onOpenPanel">
+                <text class="rd-act-txt">操作</text>
+            </div>
+            <div class="rd-act-btn rd-ghost" onclick="onGoHome">
+                <text class="rd-act-txt">返回</text>
+            </div>
+        </div>
+    </stack>
+
+    <stack class="rd-state lwb-in" else>
+        <text class="rd-state-title">{{failTitle}}</text>
+        <text class="rd-state-sub">{{failSub}}</text>
+        <div class="rd-act-row">
+            <div class="rd-act-btn" onclick="onRetry">
+                <text class="rd-act-txt">重试</text>
+            </div>
+            <div class="rd-act-btn rd-ghost" onclick="onGoHome">
+                <text class="rd-act-txt">返回首页</text>
+            </div>
+        </div>
+    </stack>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <stack class="rd-hdr">
+        <div class="rd-hdr-btn rd-hdr-back-btn" onclick="onBack">
+            <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="rd-hdr-title">{{title}}</text>
+        <div class="rd-hdr-btn rd-hdr-star-btn" onclick="onToggleBookmark">
+            <image class="rd-star" src="{{starIcon}}"></image>
+        </div>
+    </stack>
+
+    <text class="rd-foot">{{pageLabel}}</text>
+
+    <stack class="rd-panel lwb-slide" if="{{panelOpen}}">
+        <list class="rd-panel-list" ref="toolList" id="toolList" rotationvibrate="true">
+            <list-item class="rd-spacer-item">
+                <div class="rd-spacer"></div>
+            </list-item>
+
+            <list-item class="rd-mi">
+                <stack class="rd-cap" onclick="onOpenLinks">
+                    <stack class="rd-cap-ico">
+                        <image class="rd-cap-img" src="/common/ic_link.png"></image>
+                    </stack>
+                    <text class="rd-cap-txt">链接</text>
+                </stack>
+            </list-item>
+
+            <list-item class="rd-mi">
+                <stack class="rd-cap" onclick="onToggleBookmark">
+                    <stack class="rd-cap-ico">
+                        <image class="rd-cap-img" src="{{starIcon}}"></image>
+                    </stack>
+                    <text class="rd-cap-txt">{{saveLabel}}</text>
+                </stack>
+            </list-item>
+
+            <list-item class="rd-mi">
+                <stack class="rd-cap" onclick="onSaveOffline">
+                    <stack class="rd-cap-ico">
+                        <image class="rd-cap-img" src="/common/ic_save.png"></image>
+                    </stack>
+                    <text class="rd-cap-txt" style="color: {{saveOffColor}};">{{saveOffLabel}}</text>
+                    <div class="rd-sv-track" style="background-color: {{saveTrackBg}};"></div>
+                    <div class="rd-sv-fill" style="width: {{saveBarW}}px;"></div>
+                </stack>
+            </list-item>
+
+            <list-item class="rd-mi">
+                <stack class="rd-cap" onclick="onOpenSettings">
+                    <stack class="rd-cap-ico">
+                        <image class="rd-cap-img" src="/common/ic_gear.png"></image>
+                    </stack>
+                    <text class="rd-cap-txt">设置</text>
+                </stack>
+            </list-item>
+
+            <list-item class="rd-tail-item">
+                <div class="rd-tail"></div>
+            </list-item>
+        </list>
+
+        <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+        <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+        <stack class="rd-panel-head">
+            <div class="rd-hdr-btn rd-panel-back-btn" onclick="onClosePanel">
+                <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="rd-panel-title">操作</text>
+            <div class="rd-hdr-btn rd-hdr-btn-flat rd-panel-gap-btn"></div>
+        </stack>
+    </stack>
+</stack>

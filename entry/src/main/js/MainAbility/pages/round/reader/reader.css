@@ -1,0 +1,523 @@
+/* 圆屏阅读页（独立布局）：466×466，内容列 340（x=63），上下弧形遮罩。 */
+
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes lwb-turn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.lwb-turn {
+  animation-name: lwb-turn;
+  animation-duration: 160ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes lwb-slide {
+  0% { transform: translateX(466px); }
+  100% { transform: translateX(0px); }
+}
+
+.lwb-slide {
+  animation-name: lwb-slide;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.rd-root {
+  width: 466px;
+  height: 466px;
+  background-color: #000000;
+}
+
+.rd-hdr {
+  width: 340px;
+  height: 52px;
+  left: 63px;
+  top: 56px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-hdr-btn {
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.rd-hdr-btn-flat {
+  background-color: #000000;
+}
+
+/* stack 子节点按 left/top 定位，避免依赖 stack 不支持的 flex 流。 */
+.rd-hdr-back-btn {
+  left: 0px;
+  top: 2px;
+}
+
+.rd-hdr-star-btn {
+  left: 292px;
+  top: 2px;
+}
+
+.rd-hdr-back {
+  width: 38px;
+  height: 38px;
+}
+
+.rd-hdr-title {
+  width: 224px;
+  height: 32px;
+  left: 58px;
+  top: 10px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-star {
+  width: 24px;
+  height: 24px;
+}
+
+/* 正文条件区先放进静态 rd-content（left63/top120），条件节点再在
+   这个 stack 内按原点叠放；避免条件根节点在部分固件上忽略自身 left/top
+   而叠到页头（模拟器反馈的“失败态标题压住页头”根因）。 */
+.rd-content {
+  width: 340px;
+  height: 264px;
+  left: 63px;
+  top: 120px;
+}
+
+.rd-body,
+.rd-state,
+.rd-start,
+.rd-text-layer {
+  width: 340px;
+  height: 264px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-state {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.rd-text {
+  width: 340px;
+  height: 264px;
+  color: #64B5FF;
+  text-overflow: clip;
+}
+
+.rd-text-layer {
+  width: 340px;
+  height: 264px;
+}
+
+.rd-zone-top {
+  width: 340px;
+  height: 110px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-zone-bottom {
+  width: 340px;
+  height: 110px;
+  left: 0px;
+  top: 154px;
+}
+
+.rd-nav {
+  width: 340px;
+  height: 44px;
+  left: 0px;
+  top: 220px;
+}
+
+.rd-nav-btn {
+  width: 106px;
+  height: 44px;
+  top: 0px;
+  border-radius: 22px;
+  background-color: #1C1C1E;
+  justify-content: center;
+  align-items: center;
+}
+
+.rd-nav-prev {
+  left: 0px;
+}
+
+.rd-nav-toc {
+  left: 117px;
+}
+
+.rd-nav-next {
+  left: 234px;
+  background-color: #2D6CFF;
+}
+
+.rd-nav-btn-txt {
+  width: 100px;
+  height: 26px;
+  font-size: 18px;
+  line-height: 26px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.rd-mask-top {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-mask-bottom {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 356px;
+}
+
+.rd-foot {
+  width: 340px;
+  height: 22px;
+  left: 63px;
+  top: 392px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+/* 书名 / 目录起始页 */
+.rd-start {
+  flex-direction: column;
+  align-items: center;
+}
+
+.rd-tv-title {
+  width: 340px;
+  height: 40px;
+  left: 0px;
+  top: 0px;
+  font-size: 26px;
+  line-height: 40px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-tv-intro {
+  width: 340px;
+  height: 60px;
+  left: 0px;
+  top: 48px;
+  font-size: 16px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-align: center;
+  text-overflow: clip;
+}
+
+.rd-tv-btn {
+  width: 340px;
+  height: 48px;
+  left: 0px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+}
+
+.rd-tv-btn-a {
+  top: 120px;
+}
+
+.rd-tv-btn-b {
+  top: 180px;
+}
+
+.rd-primary {
+  background-color: #2D6CFF;
+}
+
+.rd-ghost {
+  background-color: #1C1C1E;
+}
+
+.rd-tv-btn-txt {
+  width: 332px;
+  height: 26px;
+  font-size: 20px;
+  line-height: 26px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.rd-tv-btn-txt2 {
+  width: 332px;
+  height: 26px;
+  font-size: 18px;
+  line-height: 26px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* 加载态 */
+.rd-spin {
+  width: 64px;
+  height: 64px;
+  left: 138px;
+  top: 31px;
+  margin-bottom: 8px;
+}
+
+.rd-sway {
+  width: 36px;
+  height: 36px;
+  top: 14px;
+  left: 14px;
+}
+
+.rd-sway-img {
+  width: 36px;
+  height: 36px;
+}
+
+.rd-state-title {
+  width: 330px;
+  height: 32px;
+  left: 5px;
+  top: 59px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-load-title {
+  top: 103px;
+}
+
+.rd-state-sub {
+  width: 330px;
+  height: 40px;
+  left: 5px;
+  top: 99px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 20px;
+  color: #8E8E93;
+  text-align: center;
+  text-overflow: clip;
+}
+
+.rd-load-sub {
+  top: 143px;
+}
+
+.rd-load-track {
+  width: 240px;
+  height: 6px;
+  left: 50px;
+  top: 195px;
+  margin-top: 12px;
+  border-radius: 3px;
+  background-color: #1C1C1E;
+}
+
+.rd-load-fill {
+  width: 0px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #2D6CFF;
+}
+
+.rd-load-label {
+  width: 240px;
+  height: 24px;
+  left: 50px;
+  top: 209px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+.rd-act-row {
+  width: 330px;
+  height: 52px;
+  left: 5px;
+  top: 153px;
+  margin-top: 14px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.rd-act-btn {
+  width: 155px;
+  height: 48px;
+  margin-left: 5px;
+  margin-right: 5px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #2D6CFF;
+}
+
+.rd-act-txt {
+  width: 147px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* 操作页（右侧滑入，整屏黑底） */
+.rd-panel {
+  width: 466px;
+  height: 466px;
+  left: 0px;
+  top: 0px;
+  background-color: #000000;
+}
+
+.rd-panel-head {
+  width: 340px;
+  height: 52px;
+  left: 63px;
+  top: 56px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-panel-back-btn {
+  left: 0px;
+  top: 2px;
+}
+
+.rd-panel-gap-btn {
+  left: 292px;
+  top: 2px;
+}
+
+.rd-panel-title {
+  width: 224px;
+  height: 52px;
+  left: 58px;
+  top: 0px;
+  font-size: 28px;
+  line-height: 52px;
+  color: #2D6CFF;
+  text-align: center;
+}
+
+.rd-panel-list {
+  width: 340px;
+  height: 274px;
+  left: 63px;
+  top: 116px;
+}
+
+.rd-spacer-item,
+.rd-spacer {
+  width: 340px;
+  height: 20px;
+}
+
+.rd-tail-item,
+.rd-tail {
+  width: 340px;
+  height: 120px;
+}
+
+.rd-mi {
+  width: 340px;
+  height: 100px;
+}
+
+.rd-cap {
+  width: 340px;
+  height: 92px;
+  left: 0px;
+  top: 4px;
+  background-color: #1C1C1E;
+  border-radius: 46px;
+}
+
+.rd-cap-ico {
+  width: 64px;
+  height: 64px;
+  left: 14px;
+  top: 14px;
+  border-radius: 32px;
+  background-color: #3A3A3C;
+}
+
+.rd-cap-img {
+  width: 44px;
+  height: 44px;
+  left: 10px;
+  top: 10px;
+}
+
+.rd-cap-txt {
+  width: 236px;
+  height: 36px;
+  left: 86px;
+  top: 28px;
+  font-size: 28px;
+  line-height: 36px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-sv-track {
+  width: 240px;
+  height: 5px;
+  left: 86px;
+  top: 78px;
+  border-radius: 3px;
+  background-color: #1C1C1E;
+}
+
+.rd-sv-fill {
+  width: 0px;
+  height: 5px;
+  left: 86px;
+  top: 78px;
+  border-radius: 3px;
+  background-color: #2D6CFF;
+}
+
+

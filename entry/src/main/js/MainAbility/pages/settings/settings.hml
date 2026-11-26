@@ -1,0 +1,63 @@
+<div class="root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <div class="hdr" style="margin-top: {{g.hdrTop}}px;">
+        <div class="hdr-btn" onclick="onBack">
+            <image class="hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="hdr-title">阅读设置</text>
+        <div class="hdr-btn"></div>
+    </div>
+
+    <div class="sec lwb-in" style="height: {{g.secH}}px;">
+        <text class="sec-label" style="height: {{g.secLabelH}}px;">字号</text>
+        <div class="opt-row" style="height: {{g.optRowH}}px;">
+            <div class="opt" style="background-color: {{f0Bg}}; height: {{g.optH}}px;" onclick="onFont(0)">
+                <text class="opt-txt" style="color: {{f0Fg}};">小</text>
+            </div>
+            <div class="opt" style="background-color: {{f1Bg}}; height: {{g.optH}}px;" onclick="onFont(1)">
+                <text class="opt-txt" style="color: {{f1Fg}};">标准</text>
+            </div>
+            <div class="opt" style="background-color: {{f2Bg}}; height: {{g.optH}}px;" onclick="onFont(2)">
+                <text class="opt-txt" style="color: {{f2Fg}};">大</text>
+            </div>
+            <div class="opt" style="background-color: {{f3Bg}}; height: {{g.optH}}px;" onclick="onFont(3)">
+                <text class="opt-txt" style="color: {{f3Fg}};">特大</text>
+            </div>
+        </div>
+    </div>
+
+    <div class="sec lwb-in" style="height: {{g.secH}}px;">
+        <text class="sec-label" style="height: {{g.secLabelH}}px;">行距</text>
+        <div class="opt-row" style="height: {{g.optRowH}}px;">
+            <div class="opt line-opt" style="background-color: {{l0Bg}}; height: {{g.optH}}px;" onclick="onLine(0)">
+                <text class="opt-txt" style="color: {{l0Fg}};">紧凑</text>
+            </div>
+            <div class="opt line-opt" style="background-color: {{l1Bg}}; height: {{g.optH}}px;" onclick="onLine(1)">
+                <text class="opt-txt" style="color: {{l1Fg}};">标准</text>
+            </div>
+            <div class="opt line-opt" style="background-color: {{l2Bg}}; height: {{g.optH}}px;" onclick="onLine(2)">
+                <text class="opt-txt" style="color: {{l2Fg}};">宽松</text>
+            </div>
+        </div>
+    </div>
+
+    <!-- 屏幕常亮（v3.7）：紧凑行 = 标签 + 开/关。阻止不活动超时自动息屏，
+         加载大站时屏幕不再中途熄灭（息屏→切后台→进程被回收→应用关闭） -->
+    <div class="keep lwb-in" style="height: {{g.keepH}}px;">
+        <text class="keep-label">屏幕常亮</text>
+        <div class="keep-opts">
+            <div class="opt keep-opt" style="background-color: {{kOnBg}}; height: {{g.optH}}px;" onclick="onKeep(true)">
+                <text class="opt-txt" style="color: {{kOnFg}};">开</text>
+            </div>
+            <div class="opt keep-opt" style="background-color: {{kOffBg}}; height: {{g.optH}}px;" onclick="onKeep(false)">
+                <text class="opt-txt" style="color: {{kOffFg}};">关</text>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview lwb-in" show="{{g.extraOn}}">
+        <text class="preview-txt"
+              style="font-size: {{fontSizePx}}px; line-height: {{lineHeightPx}}px;">{{previewText}}</text>
+    </div>
+
+    <text class="hint" show="{{g.extraOn}}">设置立即生效，返回后自动重新分页并保持阅读位置</text>
+</div>

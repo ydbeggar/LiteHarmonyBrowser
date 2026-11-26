@@ -1,0 +1,44 @@
+<stack class="rd-root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <stack class="rd-body">
+        <list class="rd-list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasLinks}}" style="opacity: {{fadeOpacity}};">
+            <list-item class="rd-item" for="{{(index, item) in links}}" tid="href" onclick="onOpen(index)">
+                <div class="rd-item-inner">
+                    <div class="rd-item-text">
+                        <text class="rd-item-title">{{item.text}}</text>
+                        <text class="rd-item-host">{{item.sub}}</text>
+                    </div>
+                    <text class="rd-item-arrow">›</text>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="rd-empty lwb-in" else>
+            <text class="rd-empty-title">本页无可用链接</text>
+            <text class="rd-empty-sub">可以返回继续阅读，或回到首页输入新地址</text>
+            <div class="rd-empty-btn" onclick="onBack">
+                <text class="rd-empty-btn-txt">返回阅读</text>
+            </div>
+        </div>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <div class="rd-hdr">
+        <div class="rd-hdr-btn" onclick="onBack">
+            <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="rd-hdr-title">{{title}}</text>
+        <text class="rd-hdr-count">{{countLabel}}</text>
+    </div>
+
+    <div class="rd-pager">
+        <div class="rd-pager-btn" onclick="onPrevPage">
+            <text class="rd-pager-ic" style="color: {{prevColor}};">‹</text>
+        </div>
+        <text class="rd-pager-label">{{pageLabel}}</text>
+        <div class="rd-pager-btn" onclick="onNextPage">
+            <text class="rd-pager-ic" style="color: {{nextColor}};">›</text>
+        </div>
+    </div>
+</stack>

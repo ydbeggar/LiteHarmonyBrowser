@@ -1,0 +1,252 @@
+<stack class="root" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <!-- 形态判定完成前只挂一张全屏黑底，不构建 fit-root/rd-home 任何一棵树；
+         判定完成后 g 与 layoutReady 同一次 setData，只构建最终那一棵。
+         这样圆屏上不会出现“先方屏树 → 再圆屏树”的整树替换，
+         规避 GT6 上偶发的紫色块/残影（滑动后才重绘的渲染 bug）。 -->
+    <stack class="boot" if="{{g.layoutReady != true}}"></stack>
+
+    <!-- 圆屏独立首页（466×466）：取消固定置顶大标题，标题作为列表首条随内容滚动，
+         顶部/底部各叠一张 466×110 弧形遮罩（黑色 alpha 渐变 + 圆形裁切）。
+         与下方 fit-root（方屏 408×480 原布局）互斥。 -->
+    <stack class="rd-home" elif="{{g.round}}">
+        <swiper class="rd-swiper" ref="homeSwiper" id="homeSwiper" index="{{pageIndex}}" loop="false" duration="300" onchange="onPageChange">
+            <div class="rd-page">
+                <stack class="rd-page-stack">
+                <list class="rd-list" ref="homeList" id="homeList" rotationvibrate="true"
+                      ontouchstart="onListTouchStart" ontouchmove="onListTouchMove" ontouchend="onListTouchEnd">
+                    <list-item class="rd-spacer-item">
+                        <div class="rd-spacer"></div>
+                    </list-item>
+                    <list-item class="rd-title-item">
+                        <text class="rd-title">轻鸿浏览器</text>
+                    </list-item>
+                    <list-item class="rd-mi" for="{{(index, item) in menu}}" tid="key">
+                        <stack class="rd-cap" onclick="onMenu(index)">
+                            <stack class="rd-cap-ico">
+                                <image class="rd-cap-img" src="{{item.icon}}"></image>
+                            </stack>
+                            <text class="rd-cap-txt">{{item.name}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-tail-item">
+                        <div class="rd-tail"></div>
+                    </list-item>
+                </list>
+                <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+                <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+                </stack>
+            </div>
+            <div class="rd-page">
+                <stack class="rd-page-stack">
+                <list class="rd-list" ref="aboutList" id="aboutList" rotationvibrate="true"
+                      ontouchstart="onAboutTouchStart" ontouchmove="onAboutTouchMove" ontouchend="onAboutTouchEnd">
+                    <list-item class="rd-spacer-item">
+                        <div class="rd-spacer"></div>
+                    </list-item>
+                    <list-item class="rd-title-item">
+                        <text class="rd-title">关于</text>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">应用名称</text>
+                            <text class="rd-card-value">轻鸿浏览器</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">版本号</text>
+                            <text class="rd-card-value">{{appVersion}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">作者</text>
+                            <text class="rd-card-value">豚鼠</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">本地文件</text>
+                            <text class="rd-card-value">{{savedText}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">屏幕形态</text>
+                            <text class="rd-card-value">{{screenType}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item">
+                        <stack class="rd-card">
+                            <text class="rd-card-label">性能体验</text>
+                            <text class="rd-card-value">{{perfMode}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item" onclick="onToggleForceFull">
+                        <stack class="rd-card">
+                            <text class="rd-clear-label" style="color: {{forceFullColor}};">{{forceFullLabel}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item" onclick="onClearSaved">
+                        <stack class="rd-card rd-clear-card">
+                            <text class="rd-clear-label" style="color: {{savedBtnColor}};">{{savedBtn}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-card-item" onclick="onClearAll">
+                        <stack class="rd-card rd-clear-card">
+                            <text class="rd-clear-label" style="color: {{clearAllColor}};">{{clearAllLabel}}</text>
+                        </stack>
+                    </list-item>
+                    <list-item class="rd-tail-item">
+                        <div class="rd-tail"></div>
+                    </list-item>
+                </list>
+                <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+                <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+                </stack>
+            </div>
+        </swiper>
+        <!-- 遮罩已在每个 rd-page-stack 内、紧跟列表渲染；指示器再叠在遮罩之上 -->
+        <div class="rd-page-break" if="{{pageIndex == 0}}">
+            <div class="rd-pg-pill"></div>
+            <div class="rd-pg-dot rd-pg-gap"></div>
+        </div>
+        <div class="rd-page-break" else>
+            <div class="rd-pg-dot"></div>
+            <div class="rd-pg-pill rd-pg-gap"></div>
+        </div>
+    </stack>
+
+    <stack class="fit-root" else>
+        <!-- 原生 swiper 分页（微信 v1.1 LW-PAGE-H01 同款：swiper > div > list，
+             列表竖向原生滚动 + 左右原生翻页共存；indicator:false 用自定义指示器） -->
+        <swiper class="swiper" style="width: {{g.w}}px; height: {{g.h}}px;" ref="homeSwiper" id="homeSwiper" index="{{pageIndex}}" loop="false" duration="300" onchange="onPageChange">
+            <div class="page" style="width: {{g.w}}px; height: {{g.h}}px;">
+                <stack class="home" style="width: {{g.w}}px; height: {{g.h}}px;">
+                    <text class="app-title" style="width: {{g.titleW}}px; left: {{g.titleX}}px; top: {{g.titleY}}px; text-align: {{g.titleAlign}};">轻鸿浏览器</text>
+                    <list class="menu" style="left: {{g.menuX}}px; top: {{g.menuY}}px; height: {{g.menuH}}px;" ref="homeList" id="homeList" rotationvibrate="true"
+                          ontouchstart="onListTouchStart" ontouchmove="onListTouchMove" ontouchend="onListTouchEnd">
+                        <list-item class="spacer-item">
+                            <div class="spacer-box"></div>
+                        </list-item>
+                        <list-item class="mi" for="{{(index, item) in menu}}" tid="key">
+                            <stack class="cap" onclick="onMenu(index)">
+                                <stack class="cap-ico">
+                                    <image class="cap-img" src="{{item.icon}}"></image>
+                                </stack>
+                                <text class="cap-txt">{{item.name}}</text>
+                            </stack>
+                        </list-item>
+                        <list-item class="mi">
+                            <div class="tail-space"></div>
+                        </list-item>
+                    </list>
+                    <!-- 顶部类高斯模糊渐隐帘（底部 shader 的镜像朝向：实心端紧贴文字底缘 y=72，
+                         向下渐隐；标题文字底部不接触任何模糊，滚动内容向上渐隐入标题区） -->
+                    <image class="shader-top" style="width: {{g.shaderTopW}}px; top: {{g.shaderTopY}}px;" src="/common/shader_top.png"></image>
+                </stack>
+            </div>
+
+            <div class="page" style="width: {{g.w}}px; height: {{g.h}}px;">
+                <stack class="about" style="width: {{g.w}}px; height: {{g.h}}px;">
+                    <text class="about-title" style="left: {{g.aboutTitleX}}px; top: {{g.aboutTitleY}}px;">关于</text>
+                    <!-- 关于页 = 可滚动卡片列表（v3.2：存储信息行加入，超出一屏） -->
+                    <list class="about-list" style="left: {{g.aboutListX}}px; top: {{g.aboutListY}}px; height: {{g.aboutListH}}px;" ref="aboutList" id="aboutList" rotationvibrate="true"
+                          ontouchstart="onAboutTouchStart" ontouchmove="onAboutTouchMove" ontouchend="onAboutTouchEnd">
+                        <!-- 引导留白（v3.8 补齐顶部帘后防遮挡）：首条下移到渐隐帘透明端之外 -->
+                        <list-item class="spacer-item">
+                            <div class="spacer-box"></div>
+                        </list-item>
+
+                        <!-- 条目（v3.9）：与首页同尺寸胶囊（376×100 r50），文字居中 -->
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">应用名称</text>
+                                <text class="card-value">轻鸿浏览器</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">版本号</text>
+                                <text class="card-value">{{appVersion}}</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">作者</text>
+                                <text class="card-value">豚鼠</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">本地文件</text>
+                                <text class="card-value">{{savedText}}</text>
+                            </stack>
+                        </list-item>
+
+                        <!-- v1.0.8 设备能力 -->
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">屏幕形态</text>
+                                <text class="card-value">{{screenType}}</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-item">
+                            <stack class="card">
+                                <text class="card-label">性能体验</text>
+                                <text class="card-value">{{perfMode}}</text>
+                            </stack>
+                        </list-item>
+
+                        <!-- v1.0.8 强开完整模式 -->
+                        <list-item class="ac-item" onclick="onToggleForceFull">
+                            <stack class="card">
+                                <text class="clear-label" style="color: {{forceFullColor}};">{{forceFullLabel}}</text>
+                            </stack>
+                        </list-item>
+
+                        <!-- 清除数据大胶囊（v3.10）：与上方条目尺寸统一（376×100 r50），
+                             二次确认：点一次转红「确认清除数据」，再点执行 -->
+                        <list-item class="ac-item" onclick="onClearSaved">
+                            <stack class="card clear-card">
+                                <text class="clear-label" style="color: {{savedBtnColor}};">{{savedBtn}}</text>
+                            </stack>
+                        </list-item>
+
+                        <!-- v1.0.8 清除全部数据（崩溃修复用） -->
+                        <list-item class="ac-item" onclick="onClearAll">
+                            <stack class="card clear-card">
+                                <text class="clear-label" style="color: {{clearAllColor}};">{{clearAllLabel}}</text>
+                            </stack>
+                        </list-item>
+
+                        <list-item class="ac-tail">
+                            <div class="spacer-box"></div>
+                        </list-item>
+                    </list>
+                    <!-- 顶部渐隐帘（v3.8 补齐，与主页同款贴图与几何关系）：
+                         实心端贴「关于」标题底缘 y=66 向下渐隐，滚动内容向上渐隐入标题区 -->
+                    <image class="about-shader-top" style="width: {{g.shaderTopW}}px; top: {{g.aboutShaderTopY}}px;" src="/common/shader_top.png"></image>
+                </stack>
+            </div>
+        </swiper>
+
+        <!-- 底部高斯模糊式渐变贴图（微信 shader.png 同款曲线，固定叠加不随页滑动） -->
+        <image class="shader" style="width: {{g.shaderW}}px; top: {{g.shaderY}}px;" src="/common/shader.png"></image>
+
+        <!-- 页面状态指示器（微信 pageBreak 同款几何：active 20×10 + inactive 10×10，间距 8，
+             if 静态切换；蓝色沿用本作强调色） -->
+        <div class="page-break" style="left: {{g.breakX}}px; top: {{g.breakY}}px;" if="{{pageIndex == 0}}">
+            <div class="pg-pill"></div>
+            <div class="pg-dot pg-gap"></div>
+        </div>
+        <div class="page-break" style="left: {{g.breakX}}px; top: {{g.breakY}}px;" else>
+            <div class="pg-dot"></div>
+            <div class="pg-pill pg-gap"></div>
+        </div>
+    </stack>
+</stack>

@@ -1,0 +1,56 @@
+<div class="root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <div class="hdr" style="margin-top: {{g.hdrTop}}px;">
+        <div class="hdr-btn" onclick="onBack">
+            <image class="hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="hdr-title">{{title}}</text>
+        <text class="hdr-count">{{countLabel}}</text>
+    </div>
+
+    <div class="seg" style="height: {{g.segH}}px;">
+        <div class="seg-btn" style="background-color: {{bmBg}};" onclick="onShowBookmarks">
+            <text class="seg-txt" style="color: {{bmColor}};">书签</text>
+        </div>
+        <div class="seg-btn" style="background-color: {{hisBg}};" onclick="onShowHistory">
+            <text class="seg-txt" style="color: {{hisColor}};">历史</text>
+        </div>
+    </div>
+
+    <div class="act" style="height: {{g.actH}}px;">
+        <div class="pager" style="height: {{g.pagerH}}px;">
+            <div class="pager-btn" onclick="onPrevPage">
+                <text class="pager-ic" style="color: {{prevColor}};">‹</text>
+            </div>
+            <text class="pager-label">{{pageLabel}}</text>
+            <div class="pager-btn" onclick="onNextPage">
+                <text class="pager-ic" style="color: {{nextColor}};">›</text>
+            </div>
+        </div>
+        <div class="act-right">
+            <div class="act-btn" if="{{hasClear}}" onclick="onClear">
+                <text class="act-btn-txt">{{clearLabel}}</text>
+            </div>
+        </div>
+    </div>
+
+    <stack class="body" style="height: {{g.bodyH}}px;">
+        <list class="list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasItems}}" style="opacity: {{fadeOpacity}}; height: {{g.listH}}px;">
+            <list-item class="item" for="{{(index, item) in items}}" tid="url">
+                <div class="item-inner">
+                    <div class="item-open" onclick="onOpen(index)">
+                        <text class="item-title">{{item.title}}</text>
+                        <text class="item-sub">{{item.sub}}</text>
+                    </div>
+                    <div class="item-del" onclick="onDelete(index)">
+                        <text class="item-del-txt">删除</text>
+                    </div>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="empty lwb-in" else style="height: {{g.emptyH}}px;">
+            <text class="empty-title">{{emptyTitle}}</text>
+            <text class="empty-sub">{{emptySub}}</text>
+        </div>
+    </stack>
+</div>

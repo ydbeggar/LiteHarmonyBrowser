@@ -1,0 +1,73 @@
+{
+  "app": {
+    "bundleName": "com.example.litewearbrowser",
+    "vendor": "example",
+    "version": {
+      "code": 1101,
+      "name": "1.1.1"
+    },
+    "apiVersion": {
+      "compatible": 50000012,
+      "target": 60100023,
+      "releaseType": "Release"
+    }
+  },
+  "deviceConfig": {
+    "default": {}
+  },
+  "module": {
+    "deviceType": [
+      "liteWearable"
+    ],
+    "distro": {
+      "deliveryWithInstall": true,
+      "moduleName": "entry",
+      "moduleType": "entry"
+    },
+    "abilities": [
+      {
+        "name": ".MainAbility",
+        "srcLanguage": "js",
+        "srcPath": "MainAbility",
+        "icon": "$media:icon",
+        "description": "$string:app_desc",
+        "label": "$string:app_name",
+        "type": "page"
+      }
+    ],
+    "js": [
+      {
+        "name": ".MainAbility",
+        "pages": [
+          "pages/index/index",
+          "pages/reader/reader",
+          "pages/links/links",
+          "pages/shelf/shelf",
+          "pages/settings/settings",
+          "pages/search/search",
+          "pages/offline/offline",
+          "pages/novel/novel",
+          "pages/round/reader/reader",
+          "pages/round/links/links",
+          "pages/round/shelf/shelf",
+          "pages/round/settings/settings",
+          "pages/round/search/search",
+          "pages/round/offline/offline",
+          "pages/round/novel/novel"
+        ]
+      }
+    ],
+    "reqPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:reqPermissions",
+        "usedScene": {
+          "ability": [
+            "MainAbility"
+          ],
+          "when": "always"
+        }
+      }
+    ]
+  }
+}

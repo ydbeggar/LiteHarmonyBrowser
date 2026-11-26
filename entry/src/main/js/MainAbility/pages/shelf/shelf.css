@@ -1,0 +1,265 @@
+/* 轻鸿浏览器 v2.0 · 书架页 — 华为创新研究视觉语言（玻璃胶囊卡 / 分段胶囊 / 危险红） */
+
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* v3.1 清理：.view 死类已移除 */
+
+.body {
+  width: 376px;
+  height: 252px;
+  margin-top: 4px;
+}
+
+.hdr {
+  width: 376px;
+  height: 52px;
+  margin-top: 48px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hdr-btn {
+  width: 52px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #1C1C1E;
+}
+
+/* 返回钮图标（v3.8）：chevron PNG 42px 居中——28px 文字字形偏小且与圆底不居中 */
+.hdr-back {
+  width: 42px;
+  height: 42px;
+}
+
+.hdr-title {
+  width: 220px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.hdr-count {
+  width: 76px;
+  height: 28px;
+  font-size: 15px;
+  line-height: 28px;
+  color: #8E8E93;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+/* 分段胶囊：书签 / 历史（选中侧为青绿实心胶囊） */
+.seg {
+  width: 376px;
+  height: 56px;
+  margin-top: 8px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seg-btn {
+  width: 184px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 28px;
+}
+
+.seg-txt {
+  width: 172px;
+  height: 28px;
+  font-size: 20px;
+  line-height: 28px;
+  text-align: center;
+}
+
+.act {
+  width: 376px;
+  height: 52px;
+  margin-top: 4px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pager {
+  width: 232px;
+  height: 56px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.pager-btn {
+  width: 56px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.pager-ic {
+  width: 56px;
+  height: 48px;
+  font-size: 26px;
+  line-height: 48px;
+  text-align: center;
+}
+
+.pager-label {
+  width: 110px;
+  height: 28px;
+  font-size: 17px;
+  line-height: 28px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+/* v3.1 清理：.act-hint 死类已移除 */
+
+.act-right {
+  width: 136px;
+  height: 48px;
+}
+
+.act-btn {
+  width: 136px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.act-btn-txt {
+  width: 128px;
+  height: 26px;
+  font-size: 17px;
+  line-height: 26px;
+  text-align: center;
+  color: #FF453A;
+}
+
+.list {
+  width: 376px;
+  height: 252px;
+  margin-top: 4px;
+  background-color: #000000;
+}
+
+.item {
+  width: 376px;
+  height: 84px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.item-inner {
+  width: 340px;
+  height: 80px;
+  flex-direction: row;
+  align-items: center;
+  background-color: #1C1C1E;
+  border-radius: 42px;
+  padding-left: 24px;
+  padding-right: 12px;
+  margin-top: 2px;
+}
+
+.item-open {
+  width: 244px;
+  height: 56px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.item-title {
+  width: 244px;
+  height: 30px;
+  font-size: 20px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+
+.item-sub {
+  width: 244px;
+  height: 22px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+
+.item-del {
+  width: 88px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+  margin-left: 8px;
+}
+
+.item-del-txt {
+  width: 80px;
+  height: 26px;
+  font-size: 17px;
+  line-height: 26px;
+  text-align: center;
+  color: #FF453A;
+}
+
+.empty {
+  width: 376px;
+  height: 252px;
+  margin-top: 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-title {
+  width: 344px;
+  height: 32px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.empty-sub {
+  width: 344px;
+  height: 44px;
+  font-size: 15px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-align: center;
+  margin-top: 8px;
+}

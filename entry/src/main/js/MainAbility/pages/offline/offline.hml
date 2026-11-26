@@ -1,0 +1,30 @@
+<stack class="root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <div class="hdr" style="margin-top: {{g.hdrTop}}px;">
+        <div class="hdr-btn" onclick="onBack">
+            <image class="hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="hdr-title">离线网页</text>
+        <text class="hdr-count">{{countLabel}}</text>
+    </div>
+
+    <stack class="body" style="height: {{g.bodyH}}px;">
+        <list class="list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasItems}}" style="height: {{g.listH}}px;">
+            <list-item class="item" for="{{(index, item) in items}}" tid="key">
+                <div class="item-inner">
+                    <div class="item-open" onclick="onOpen(index)">
+                        <text class="item-title">{{item.title}}</text>
+                        <text class="item-sub">{{item.sub}}</text>
+                    </div>
+                    <div class="item-del" onclick="onDelete(index)">
+                        <text class="item-del-txt">删除</text>
+                    </div>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="empty lwb-in" else style="height: {{g.emptyH}}px;">
+            <text class="empty-title">暂无离线网页</text>
+            <text class="empty-sub">阅读时从右侧滑出操作页，点「保存离线」即可缓存当前正文</text>
+        </div>
+    </stack>
+</stack>

@@ -1,0 +1,203 @@
+/* 小说搜索页：与网页搜索页（search.css）完全一致的视觉风格 */
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+}
+
+/* 页头：与 search.css 相同 */
+.hdr {
+  width: 376px;
+  height: 52px;
+  left: 16px;
+  top: 48px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.hdr-btn {
+  width: 52px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #1C1C1E;
+}
+.hdr-btn-flat {
+  background-color: #000000;
+}
+.hdr-back {
+  width: 42px;
+  height: 42px;
+}
+.hdr-title {
+  width: 248px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 列表区 */
+.s-list {
+  width: 376px;
+  height: 372px;
+  left: 16px;
+  top: 108px;
+}
+
+/* 搜索栏：与 search.css 相同 */
+.bar {
+  width: 376px;
+  height: 60px;
+  left: 0px;
+  top: 0px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.bar-input {
+  width: 242px;
+  height: 56px;
+  font-size: 20px;
+  color: #FFFFFF;
+  placeholder-color: #8E8E93;
+  background-color: #1C1C1E;
+  border-width: 0px;
+  border-radius: 28px;
+  padding-left: 20px;
+  padding-right: 14px;
+}
+.bar-btn {
+  width: 112px;
+  height: 56px;
+  background-color: #2D6CFF;
+  border-radius: 28px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.bar-btn-txt {
+  width: 100px;
+  height: 28px;
+  font-size: 22px;
+  line-height: 28px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 结果区 */
+.area {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 82px;
+}
+.state {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.state-title {
+  width: 344px;
+  height: 32px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+.state-sub {
+  width: 344px;
+  height: 44px;
+  font-size: 15px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* 结果列表：与 search.css 相同 */
+.list {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 0px;
+  background-color: #000000;
+}
+.spacer-item {
+  width: 376px;
+  height: 30px;
+}
+.spacer-box {
+  width: 376px;
+  height: 30px;
+}
+.tail-item {
+  width: 376px;
+  height: 64px;
+}
+.tail-box {
+  width: 376px;
+  height: 64px;
+}
+.item {
+  width: 376px;
+  height: 88px;
+}
+.item-inner {
+  width: 376px;
+  height: 84px;
+  left: 0px;
+  top: 2px;
+  background-color: #1C1C1E;
+  border-radius: 42px;
+}
+.item-title {
+  width: 288px;
+  height: 30px;
+  left: 36px;
+  top: 16px;
+  font-size: 20px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+.item-sub {
+  width: 288px;
+  height: 22px;
+  left: 36px;
+  top: 46px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+.item-arrow {
+  width: 32px;
+  height: 36px;
+  left: 324px;
+  top: 24px;
+  font-size: 28px;
+  line-height: 36px;
+  text-align: center;
+  color: #64B5FF;
+}
+
+/* 渐隐帘 */
+.shader-top {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 168px;
+}
+.shader {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 436px;
+}

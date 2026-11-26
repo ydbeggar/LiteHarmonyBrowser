@@ -1,0 +1,274 @@
+/* 圆屏书架页（v1.0.7 独立页面）：466×466，340 内容列，上下弧形遮罩 */
+
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.rd-root {
+  width: 466px;
+  height: 466px;
+  background-color: #000000;
+}
+
+.rd-hdr {
+  width: 340px;
+  height: 52px;
+  left: 63px;
+  top: 56px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-hdr-btn {
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.rd-hdr-back {
+  width: 38px;
+  height: 38px;
+}
+
+.rd-hdr-title {
+  width: 200px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-hdr-count {
+  width: 76px;
+  height: 28px;
+  font-size: 15px;
+  line-height: 28px;
+  color: #8E8E93;
+  text-align: right;
+}
+
+.rd-seg {
+  width: 340px;
+  height: 48px;
+  left: 63px;
+  top: 112px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-seg-btn {
+  width: 164px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 22px;
+}
+
+.rd-seg-txt {
+  width: 152px;
+  height: 26px;
+  font-size: 19px;
+  line-height: 26px;
+  text-align: center;
+}
+
+.rd-act {
+  width: 340px;
+  height: 44px;
+  left: 63px;
+  top: 164px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-pager {
+  width: 200px;
+  height: 44px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.rd-pager-btn {
+  width: 48px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 22px;
+  background-color: #1C1C1E;
+}
+
+.rd-pager-ic {
+  width: 48px;
+  height: 44px;
+  font-size: 24px;
+  line-height: 44px;
+  text-align: center;
+}
+
+.rd-pager-label {
+  width: 96px;
+  height: 26px;
+  font-size: 16px;
+  line-height: 26px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+.rd-act-right {
+  width: 132px;
+  height: 44px;
+}
+
+.rd-act-btn {
+  width: 132px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 22px;
+  background-color: #1C1C1E;
+}
+
+.rd-act-btn-txt {
+  width: 124px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+  color: #FF453A;
+}
+
+.rd-body {
+  width: 340px;
+  height: 178px;
+  left: 63px;
+  top: 212px;
+}
+
+.rd-list {
+  width: 340px;
+  height: 178px;
+  background-color: #000000;
+}
+
+.rd-item {
+  width: 340px;
+  height: 80px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rd-item-inner {
+  width: 340px;
+  height: 76px;
+  flex-direction: row;
+  align-items: center;
+  background-color: #1C1C1E;
+  border-radius: 38px;
+  padding-left: 20px;
+  padding-right: 10px;
+  margin-top: 2px;
+}
+
+.rd-item-open {
+  width: 220px;
+  height: 52px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rd-item-title {
+  width: 220px;
+  height: 28px;
+  font-size: 19px;
+  line-height: 28px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+
+.rd-item-sub {
+  width: 220px;
+  height: 20px;
+  font-size: 13px;
+  line-height: 20px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+
+.rd-item-del {
+  width: 80px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: #1C1C1E;
+  margin-left: 8px;
+}
+
+.rd-item-del-txt {
+  width: 72px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+  color: #FF453A;
+}
+
+.rd-empty {
+  width: 340px;
+  height: 178px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.rd-empty-title {
+  width: 320px;
+  height: 32px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.rd-empty-sub {
+  width: 320px;
+  height: 44px;
+  font-size: 15px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.rd-mask-top {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-mask-bottom {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 356px;
+}
+
+

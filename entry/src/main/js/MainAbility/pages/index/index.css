@@ -1,0 +1,480 @@
+/* 轻鸿浏览器 v2.6 — 首页：原生 swiper 双页（连贯滑动）+ 大胶囊目录 + 微信同款底部 shader 与指示器。
+   结构依据微信 v1.1 逆向实证（LW-PAGE-H01）：swiper > div > list；
+   手势消歧在 list 上（竖向 stopPropagation 护 swiper，横向 SetDraggable(false) 冻结列表）。
+   死区：408×480 圆角屏，控件收进 x∈[28,380]、y≤455（shader/指示器为微信实测坐标）。
+   v3.1 清理：lwb-in 入场动画类已无引用，移除。 */
+
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+}
+
+.swiper {
+  width: 408px;
+  height: 480px;
+}
+
+.page {
+  width: 408px;
+  height: 480px;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000000;
+}
+
+/* 主页内容容器（v2.9 起 stack + 显式坐标：渐隐帘需压在列表之上） */
+.home {
+  width: 408px;
+  height: 480px;
+}
+
+/* 列表引导留白（v3.2）：首条胶囊下移到渐隐帘透明端之外，未滑动不被遮挡；
+   滚动时内容照常从渐隐帘下穿过（帘尾近透明，与底部 shader 对称）。 */
+.spacer-item {
+  width: 376px;
+  height: 24px;
+}
+
+.spacer-box {
+  width: 376px;
+  height: 24px;
+}
+
+/* ---------------- 品牌标题（蓝色、靠左、避让左上圆角死区） ----------------
+   字号 28 → 36（用户要求放大）。几何：height 48 / top 24 → 底缘仍为 72，
+   与顶部渐隐帘（实心端 y=72）对齐关系不变；行盒 48 内居中使墨迹上缘约 y=30，
+   左缘 x=28 —— 距左上圆角死区圆心 (64,64) 约 49.5px < r≈64，仍在安全区内。 */
+.app-title {
+  width: 352px;
+  height: 48px;
+  left: 28px;
+  top: 24px;
+  font-size: 36px;
+  line-height: 48px;
+  color: #2D6CFF;
+  text-overflow: ellipsis;
+}
+
+/* ---------------- 大胶囊目录（list 原生滚动，单屏 3.5 条） ---------------- */
+.menu {
+  width: 376px;
+  height: 384px;
+  left: 16px;
+  top: 94px;
+}
+
+/* 顶部类高斯模糊渐隐帘（v2.9）：底部 shader 的镜像朝向——实心端紧贴文字底缘 y=72、
+   向下渐隐至近透明；标题文字底部（66px 横线下）不接触任何模糊；
+   列表滚动内容自下而上渐隐入标题区，消除黑条割裂感。 */
+.shader-top {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 72px;
+}
+
+.mi {
+  width: 376px;
+  height: 108px;
+}
+
+.cap {
+  width: 376px;
+  height: 100px;
+  left: 0px;
+  top: 8px;
+  background-color: #1C1C1E;
+  border-radius: 50px;
+}
+
+/* 左侧圆形图标底 + 高清 PNG 图形（v2.8 加大：72 圆底 + 52 图形） */
+.cap-ico {
+  width: 72px;
+  height: 72px;
+  left: 12px;
+  top: 14px;
+  border-radius: 36px;
+  background-color: #3A3A3C;
+}
+
+.cap-img {
+  width: 52px;
+  height: 52px;
+  left: 10px;
+  top: 10px;
+}
+
+/* 主标题：32px 大字 + 5px 字距，在「图标右侧空余面积」（84..376，中心 x=230）中居中，
+   文本盒 88..372 两侧各留 4px 对称留白（v2.8 图标加大后同步校准） */
+.cap-txt {
+  width: 284px;
+  height: 40px;
+  left: 88px;
+  top: 30px;
+  font-size: 32px;
+  letter-spacing: 5px;
+  line-height: 40px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+/* 尾部留白：让末条胶囊可滚离底部 shader 遮罩，保证可点按 */
+.tail-space {
+  width: 376px;
+  height: 64px;
+}
+
+/* ---------------- 关于页（v3.2：可滚动卡片列表 + 存储信息行） ---------------- */
+.about {
+  width: 408px;
+  height: 480px;
+}
+
+.about-title {
+  width: 376px;
+  height: 42px;
+  left: 16px;
+  top: 24px;
+  font-size: 30px;
+  line-height: 42px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 关于/信息页顶部渐隐帘（v3.8 补齐）：与主页同款贴图，实心端贴「关于」标题
+   底缘 y=66（标题 24..66）向下渐隐；列表 top=帘顶+22（与主页 94=72+22 同构），
+   24px 引导留白让首条落在帘透明端（114）之外，未滑动零遮挡。 */
+.about-shader-top {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 66px;
+}
+
+.about-list {
+  width: 376px;
+  height: 390px;
+  left: 16px;
+  top: 88px;
+}
+
+.ac-item {
+  width: 376px;
+  height: 108px;
+}
+
+.ac-tail {
+  width: 376px;
+  height: 72px;
+}
+
+/* 信息页条目（v3.9）：与首页同尺寸胶囊（376×100 r50），文字居中 */
+.card {
+  width: 376px;
+  height: 100px;
+  left: 0px;
+  top: 8px;
+  border-radius: 50px;
+  background-color: #1C1C1E;
+}
+
+.card-label {
+  width: 376px;
+  height: 34px;
+  left: 0px;
+  top: 20px;
+  font-size: 26px;
+  line-height: 34px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.card-value {
+  width: 376px;
+  height: 26px;
+  left: 0px;
+  top: 56px;
+  font-size: 18px;
+  line-height: 26px;
+  color: #8E8E93;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+/* 清除数据大胶囊（v3.10）：与条目同尺寸（376×100 r50），点一次转红进入确认态，
+   再点执行（onClearSaved 二次确认不变）。
+   v1.0 修复垂直居中：文本盒 40px 行高 40px、top=(100-40)/2=30——
+   line-height=100 的方案在真机上只有水平居中（行盒按字体度量偏上）。 */
+.clear-card {
+  background-color: #3A3A3C;
+}
+
+.clear-label {
+  width: 376px;
+  height: 40px;
+  left: 0px;
+  top: 30px;
+  font-size: 30px;
+  line-height: 40px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* ---------------- 底部高斯模糊式 shader（微信 shader.png 实测曲线：408×48 @ top:436） ---------------- */
+.shader {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 436px;
+}
+
+/* ---------------- 页面状态指示器（微信 pageBreak 几何：38×10 @ (185,452)） ---------------- */
+.page-break {
+  width: 38px;
+  height: 10px;
+  left: 185px;
+  top: 452px;
+  border-radius: 5px;
+  flex-direction: row;
+}
+
+.pg-pill {
+  width: 20px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #64B5FF;
+}
+
+.pg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #4A4A4C;
+}
+
+.pg-gap {
+  margin-left: 8px;
+}
+
+/* ================= 圆屏独立布局（466×466，g.round = true） =================
+   方屏布局类一律保持原样，这里只新增 .rd-* 与 .fit-root。
+   日期/坐标依据：466 圆屏内容列 340px（x 63..403 的中轴 233，列表 left 63 居中），
+   顶部/底部各 110px 弧形遮罩压住列表滚动边缘，指示器叠在遮罩之上。 */
+
+/* 方屏固定画布：仅包一层，子节点几何沿用原有绝对坐标与绑定 */
+.boot {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+}
+
+.fit-root {
+  width: 408px;
+  height: 480px;
+}
+
+.rd-home {
+  width: 466px;
+  height: 466px;
+}
+
+.rd-swiper {
+  width: 466px;
+  height: 466px;
+}
+
+.rd-page {
+  width: 466px;
+  height: 466px;
+  background-color: #000000;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 每页内部再包一层 stack：列表与上下遮罩同属页内图层，
+   避免部分固件把 swiper 原生内容画在同级遮罩之上导致底部渐变消失。 */
+.rd-page-stack {
+  width: 466px;
+  height: 466px;
+}
+
+.rd-list {
+  width: 340px;
+  height: 466px;
+  left: 63px;
+  top: 0px;
+  background-color: #000000;
+}
+
+.rd-spacer-item {
+  width: 340px;
+  height: 100px;
+}
+
+.rd-spacer {
+  width: 340px;
+  height: 100px;
+}
+
+.rd-title-item {
+  width: 340px;
+  height: 76px;
+}
+
+.rd-title {
+  width: 340px;
+  height: 76px;
+  font-size: 28px;
+  line-height: 76px;
+  color: #2D6CFF;
+  text-align: center;
+}
+
+.rd-mi {
+  width: 340px;
+  height: 100px;
+}
+
+.rd-cap {
+  width: 340px;
+  height: 92px;
+  left: 0px;
+  top: 4px;
+  background-color: #1C1C1E;
+  border-radius: 46px;
+}
+
+.rd-cap-ico {
+  width: 64px;
+  height: 64px;
+  left: 14px;
+  top: 14px;
+  border-radius: 32px;
+  background-color: #3A3A3C;
+}
+
+.rd-cap-img {
+  width: 44px;
+  height: 44px;
+  left: 10px;
+  top: 10px;
+}
+
+.rd-cap-txt {
+  width: 236px;
+  height: 36px;
+  left: 86px;
+  top: 28px;
+  font-size: 28px;
+  line-height: 36px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-tail-item {
+  width: 340px;
+  height: 120px;
+}
+
+.rd-tail {
+  width: 340px;
+  height: 120px;
+}
+
+.rd-card-item {
+  width: 340px;
+  height: 100px;
+}
+
+.rd-card {
+  width: 340px;
+  height: 92px;
+  left: 0px;
+  top: 4px;
+  background-color: #1C1C1E;
+  border-radius: 46px;
+}
+
+.rd-card-label {
+  width: 340px;
+  height: 30px;
+  left: 0px;
+  top: 16px;
+  font-size: 23px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.rd-card-value {
+  width: 340px;
+  height: 24px;
+  left: 0px;
+  top: 50px;
+  font-size: 17px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.rd-clear-card {
+  background-color: #3A3A3C;
+}
+
+.rd-clear-label {
+  width: 340px;
+  height: 36px;
+  left: 0px;
+  top: 28px;
+  font-size: 26px;
+  line-height: 36px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 上下弧形遮罩：466×110 黑色 alpha 渐变 + 圆形裁切，压住列表滚动两端 */
+.rd-mask-top {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-mask-bottom {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 356px;
+}
+
+/* 指示器必须排在遮罩之后渲染，才能显示在底部遮罩之上 */
+.rd-page-break {
+  width: 38px;
+  height: 10px;
+  left: 214px;
+  top: 414px;
+  border-radius: 5px;
+  flex-direction: row;
+}
+
+.rd-pg-pill {
+  width: 20px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #64B5FF;
+}
+
+.rd-pg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #4A4A4C;
+}
+
+.rd-pg-gap {
+  margin-left: 8px;
+}

@@ -1,0 +1,16 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "page_bg",
+      "value": "#F5F6F7"
+    },
+    {
+      "name": "page_fg",
+      "value": "#1A1A1A"
+    }
+  ]
+}

@@ -1,0 +1,500 @@
+/* 轻鸿浏览器 v2.3 · 阅读页
+   结构：阅读页（页头 + 正文 320 + 页码）+ 右侧滑出式操作页（if 插入即滑入）。
+   加载指示：白色放大镜旋转（36px，容器 64px 保证旋转不裁切）。 */
+
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes lwb-turn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.lwb-turn {
+  animation-name: lwb-turn;
+  animation-duration: 160ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+/* v3.1 清理：lwb-spin 旧加载环动画已无引用（v3.0 起为 sway.js 补间），移除 */
+
+/* 操作页从右侧滑入（280ms ease-out） */
+/* v1.0.6 双屏：从 466px 外滑入——方屏 408 与圆屏 466 都从屏幕外开始，
+   方屏观感不变（多 58px 屏外距离），圆屏不会从屏内露出半个面板。 */
+@keyframes lwb-slide {
+  0% { transform: translateX(466px); }
+  100% { transform: translateX(0px); }
+}
+
+.lwb-slide {
+  animation-name: lwb-slide;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+}
+
+.rpage {
+  width: 408px;
+  height: 480px;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000000;
+}
+
+.hdr {
+  width: 376px;
+  height: 52px;
+  margin-top: 48px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hdr-btn {
+  width: 52px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #1C1C1E;
+}
+
+/* 返回钮图标（v3.8）：chevron PNG 42px 居中——28px 文字字形偏小且与圆底不居中 */
+.hdr-back {
+  width: 42px;
+  height: 42px;
+}
+
+.hdr-title {
+  width: 248px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.body {
+  width: 376px;
+  height: 320px;
+  margin-top: 8px;
+}
+
+.page-wrap {
+  width: 376px;
+  height: 320px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-stack {
+  width: 376px;
+  height: 320px;
+}
+
+.page-text {
+  width: 376px;
+  height: 320px;
+  color: #64B5FF;
+  text-overflow: clip;
+}
+
+.zone-top {
+  width: 376px;
+  height: 150px;
+  left: 0px;
+  top: 0px;
+}
+
+.zone-bottom {
+  width: 376px;
+  height: 150px;
+  left: 0px;
+  top: 170px;
+}
+
+/* 章末三键导航行（v3.3）：上一章 / 目录 / 下一章 三胶囊 118×48@y258（间距 11），
+   stack + 显式坐标（条件块不入 flex 流）；下一章为主行动蓝，其余深灰。 */
+.nav-row {
+  width: 376px;
+  height: 48px;
+  left: 0px;
+  top: 258px;
+}
+
+.nav-btn {
+  width: 118px;
+  height: 48px;
+  top: 0px;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-prev {
+  left: 0px;
+}
+
+.nav-toc {
+  left: 129px;
+}
+
+.nav-next {
+  left: 258px;
+  background-color: #2D6CFF;
+}
+
+.nav-btn-txt {
+  width: 110px;
+  height: 28px;
+  font-size: 20px;
+  line-height: 28px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.page-foot {
+  width: 376px;
+  height: 32px;
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 32px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+/* 书名/目录页 */
+.title-view {
+  width: 376px;
+  height: 320px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tv-title {
+  width: 376px;
+  height: 44px;
+  font-size: 24px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+
+.tv-intro {
+  width: 376px;
+  height: 108px;
+  font-size: 16px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-overflow: clip;
+  margin-top: 8px;
+}
+
+.tv-btn {
+  width: 376px;
+  height: 64px;
+  margin-top: 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 32px;
+}
+
+.primary {
+  background-color: #2D6CFF;
+}
+
+.tv-btn-txt {
+  width: 360px;
+  height: 28px;
+  font-size: 21px;
+  line-height: 28px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.tv-btn-txt2 {
+  width: 360px;
+  height: 28px;
+  font-size: 19px;
+  line-height: 28px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* 加载态：放大镜水平往复（v3.0 JS 补间驱动，common/sway.js）——
+   真机反馈三关键帧 CSS sway「到右端后瞬跳回左」，改数据驱动 left 绑定：
+   余弦往复按定义连续（无节点交换、无动画重启），fade.js 同款可信机制。 */
+.spin-box {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 12px;
+}
+
+.sway {
+  width: 36px;
+  height: 36px;
+  top: 18px;
+  left: 18px;
+}
+
+.sway-img {
+  width: 36px;
+  height: 36px;
+}
+
+.state {
+  width: 376px;
+  height: 320px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.state-title {
+  width: 344px;
+  height: 32px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.state-sub {
+  width: 344px;
+  height: 46px;
+  font-size: 15px;
+  line-height: 23px;
+  color: #8E8E93;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* 加载进度条（v3.8）：240px 轨道 + 时间估值填充（0→95% 爬升） */
+.load-track {
+  width: 240px;
+  height: 6px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background-color: #1C1C1E;
+}
+
+.load-fill {
+  width: 0px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #2D6CFF;
+}
+
+.load-label {
+  width: 240px;
+  height: 24px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-align: center;
+}
+
+.act-row {
+  width: 344px;
+  height: 56px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.act-btn {
+  width: 164px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #2D6CFF;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.act-txt {
+  width: 156px;
+  height: 26px;
+  font-size: 19px;
+  line-height: 26px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* ---------------- 工具页（右侧滑出，v2.5 与首页大胶囊完全同款） ----------------
+   条件分支内全部 stack + 显式坐标；胶囊 = 64px 圆图标 + 图标右侧空余面积居中主标题。 */
+.panel-page {
+  width: 408px;
+  height: 480px;
+  left: 0px;
+  top: 0px;
+  background-color: #000000;
+}
+
+.panel-head {
+  width: 376px;
+  height: 52px;
+  left: 16px;
+  top: 48px;
+}
+
+.ph-back {
+  left: 0px;
+  top: 0px;
+}
+
+.ph-right {
+  left: 324px;
+  top: 0px;
+}
+
+.panel-title {
+  width: 248px;
+  height: 52px;
+  left: 64px;
+  top: 0px;
+  font-size: 28px;
+  line-height: 52px;
+  color: #2D6CFF;
+  text-align: center;
+}
+
+.panel-list {
+  width: 376px;
+  height: 372px;
+  left: 16px;
+  top: 108px;
+}
+
+/* 引导留白（v3.2）：首条工具下移到 shader-top（100..148）透明端之外 */
+.spacer-item {
+  width: 376px;
+  height: 36px;
+}
+
+.spacer-box {
+  width: 376px;
+  height: 36px;
+}
+
+/* 大胶囊（与首页 index.css 同款几何，两边保持一致） */
+.mi {
+  width: 376px;
+  height: 108px;
+}
+
+.cap {
+  width: 376px;
+  height: 100px;
+  left: 0px;
+  top: 8px;
+  background-color: #1C1C1E;
+  border-radius: 50px;
+}
+
+.cap-ico {
+  width: 72px;
+  height: 72px;
+  left: 12px;
+  top: 14px;
+  border-radius: 36px;
+  background-color: #3A3A3C;
+}
+
+.cap-img {
+  width: 52px;
+  height: 52px;
+  left: 10px;
+  top: 10px;
+}
+
+.cap-txt {
+  width: 284px;
+  height: 40px;
+  left: 88px;
+  top: 30px;
+  font-size: 32px;
+  letter-spacing: 5px;
+  line-height: 40px;
+  color: #FFFFFF;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.hdr-btn-flat {
+  background-color: #000000;
+}
+
+.star-ic {
+  width: 26px;
+  height: 26px;
+}
+
+/* 保存离线进度条（2.4 引入，v2.5 收进胶囊底部：240px 轨道随分片推进；
+   v2.8 随文本中心校准到 x=230） */
+.sv-track {
+  width: 240px;
+  height: 5px;
+  left: 110px;
+  top: 78px;
+  border-radius: 3px;
+  background-color: #1C1C1E;
+}
+
+.sv-fill {
+  width: 0px;
+  height: 5px;
+  left: 110px;
+  top: 78px;
+  border-radius: 3px;
+  background-color: #2D6CFF;
+}
+
+/* 底部高斯模糊式 shader（微信 shader.png 同款曲线，v2.8 补入工具页） */
+.shader {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 436px;
+}
+
+/* 顶部渐隐帘（v3.0，与首页同款镜像贴图）：实心端贴「操作」标题底缘 y=100、
+   向下渐隐；标题文字底部不接触任何模糊。 */
+.shader-top {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 100px;
+}
+
+/* 尾部留白：让末条工具可滚离底部 shader 遮罩 */
+.tail-space {
+  width: 376px;
+  height: 64px;
+}
+
+/* 幽灵（玻璃面）按钮：单类选择器，靠层叠顺序覆盖实心背景 */
+.ghost {
+  background-color: #1C1C1E;
+}

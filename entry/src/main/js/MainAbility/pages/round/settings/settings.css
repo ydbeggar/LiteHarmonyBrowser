@@ -1,0 +1,136 @@
+/* 圆屏阅读设置（v1.0.7 独立页面）：466×466，340 内容列，无预览/提示行 */
+
+.rd-root {
+  width: 466px;
+  height: 466px;
+  background-color: #000000;
+}
+
+.rd-hdr {
+  width: 340px;
+  height: 52px;
+  left: 63px;
+  top: 56px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-hdr-btn {
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  background-color: #1C1C1E;
+}
+
+.rd-hdr-back {
+  width: 38px;
+  height: 38px;
+}
+
+.rd-hdr-title {
+  width: 224px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.rd-sec {
+  width: 340px;
+  height: 68px;
+  left: 63px;
+  top: 112px;
+  flex-direction: column;
+}
+
+.rd-sec2 {
+  top: 188px;
+}
+
+.rd-sec-label {
+  width: 340px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  color: #8E8E93;
+}
+
+.rd-opt-row {
+  width: 340px;
+  height: 44px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-opt {
+  width: 80px;
+  height: 40px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+}
+
+.rd-line-opt {
+  width: 108px;
+}
+
+.rd-opt-txt {
+  width: 76px;
+  height: 24px;
+  font-size: 17px;
+  line-height: 24px;
+  text-align: center;
+}
+
+.rd-keep {
+  width: 340px;
+  height: 52px;
+  left: 63px;
+  top: 264px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rd-keep-label {
+  width: 160px;
+  height: 28px;
+  font-size: 21px;
+  line-height: 28px;
+  color: #FFFFFF;
+}
+
+.rd-keep-opts {
+  width: 172px;
+  height: 52px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rd-keep-opt {
+  width: 80px;
+  height: 40px;
+}
+
+.rd-mask-top {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 0px;
+}
+
+.rd-mask-bottom {
+  width: 466px;
+  height: 110px;
+  left: 0px;
+  top: 356px;
+}
+
+

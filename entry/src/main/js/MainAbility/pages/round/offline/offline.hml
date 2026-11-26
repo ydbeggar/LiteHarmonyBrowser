@@ -1,0 +1,33 @@
+<stack class="rd-root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <stack class="rd-body">
+        <list class="rd-list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasItems}}">
+            <list-item class="rd-item" for="{{(index, item) in items}}" tid="key">
+                <div class="rd-item-inner">
+                    <div class="rd-item-open" onclick="onOpen(index)">
+                        <text class="rd-item-title">{{item.title}}</text>
+                        <text class="rd-item-sub">{{item.sub}}</text>
+                    </div>
+                    <div class="rd-item-del" onclick="onDelete(index)">
+                        <text class="rd-item-del-txt">删除</text>
+                    </div>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="rd-empty lwb-in" else>
+            <text class="rd-empty-title">暂无离线网页</text>
+            <text class="rd-empty-sub">阅读时从右侧滑出操作页，点「保存离线」即可缓存当前正文</text>
+        </div>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <div class="rd-hdr">
+        <div class="rd-hdr-btn" onclick="onBack">
+            <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="rd-hdr-title">离线网页</text>
+        <text class="rd-hdr-count">{{countLabel}}</text>
+    </div>
+</stack>

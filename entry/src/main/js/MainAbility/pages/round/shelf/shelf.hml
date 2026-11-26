@@ -1,0 +1,59 @@
+<stack class="rd-root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <div class="rd-seg">
+        <div class="rd-seg-btn" style="background-color: {{bmBg}};" onclick="onShowBookmarks">
+            <text class="rd-seg-txt" style="color: {{bmColor}};">书签</text>
+        </div>
+        <div class="rd-seg-btn" style="background-color: {{hisBg}};" onclick="onShowHistory">
+            <text class="rd-seg-txt" style="color: {{hisColor}};">历史</text>
+        </div>
+    </div>
+
+    <div class="rd-act">
+        <div class="rd-pager">
+            <div class="rd-pager-btn" onclick="onPrevPage">
+                <text class="rd-pager-ic" style="color: {{prevColor}};">‹</text>
+            </div>
+            <text class="rd-pager-label">{{pageLabel}}</text>
+            <div class="rd-pager-btn" onclick="onNextPage">
+                <text class="rd-pager-ic" style="color: {{nextColor}};">›</text>
+            </div>
+        </div>
+        <div class="rd-act-right">
+            <div class="rd-act-btn" if="{{hasClear}}" onclick="onClear">
+                <text class="rd-act-btn-txt">{{clearLabel}}</text>
+            </div>
+        </div>
+    </div>
+
+    <stack class="rd-body">
+        <list class="rd-list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasItems}}" style="opacity: {{fadeOpacity}};">
+            <list-item class="rd-item" for="{{(index, item) in items}}" tid="url">
+                <div class="rd-item-inner">
+                    <div class="rd-item-open" onclick="onOpen(index)">
+                        <text class="rd-item-title">{{item.title}}</text>
+                        <text class="rd-item-sub">{{item.sub}}</text>
+                    </div>
+                    <div class="rd-item-del" onclick="onDelete(index)">
+                        <text class="rd-item-del-txt">删除</text>
+                    </div>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="rd-empty lwb-in" else>
+            <text class="rd-empty-title">{{emptyTitle}}</text>
+            <text class="rd-empty-sub">{{emptySub}}</text>
+        </div>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <div class="rd-hdr">
+        <div class="rd-hdr-btn" onclick="onBack">
+            <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="rd-hdr-title">{{title}}</text>
+        <text class="rd-hdr-count">{{countLabel}}</text>
+    </div>
+</stack>

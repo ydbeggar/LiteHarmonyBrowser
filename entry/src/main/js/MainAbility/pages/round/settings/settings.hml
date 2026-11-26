@@ -1,0 +1,57 @@
+<stack class="rd-root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
+    <div class="rd-sec">
+        <text class="rd-sec-label">字号</text>
+        <div class="rd-opt-row">
+            <div class="rd-opt" style="background-color: {{f0Bg}};" onclick="onFont(0)">
+                <text class="rd-opt-txt" style="color: {{f0Fg}};">小</text>
+            </div>
+            <div class="rd-opt" style="background-color: {{f1Bg}};" onclick="onFont(1)">
+                <text class="rd-opt-txt" style="color: {{f1Fg}};">标准</text>
+            </div>
+            <div class="rd-opt" style="background-color: {{f2Bg}};" onclick="onFont(2)">
+                <text class="rd-opt-txt" style="color: {{f2Fg}};">大</text>
+            </div>
+            <div class="rd-opt" style="background-color: {{f3Bg}};" onclick="onFont(3)">
+                <text class="rd-opt-txt" style="color: {{f3Fg}};">特大</text>
+            </div>
+        </div>
+    </div>
+
+    <div class="rd-sec rd-sec2">
+        <text class="rd-sec-label">行距</text>
+        <div class="rd-opt-row">
+            <div class="rd-opt rd-line-opt" style="background-color: {{l0Bg}};" onclick="onLine(0)">
+                <text class="rd-opt-txt" style="color: {{l0Fg}};">紧凑</text>
+            </div>
+            <div class="rd-opt rd-line-opt" style="background-color: {{l1Bg}};" onclick="onLine(1)">
+                <text class="rd-opt-txt" style="color: {{l1Fg}};">标准</text>
+            </div>
+            <div class="rd-opt rd-line-opt" style="background-color: {{l2Bg}};" onclick="onLine(2)">
+                <text class="rd-opt-txt" style="color: {{l2Fg}};">宽松</text>
+            </div>
+        </div>
+    </div>
+
+    <div class="rd-keep">
+        <text class="rd-keep-label">屏幕常亮</text>
+        <div class="rd-keep-opts">
+            <div class="rd-opt rd-keep-opt" style="background-color: {{kOnBg}};" onclick="onKeep(true)">
+                <text class="rd-opt-txt" style="color: {{kOnFg}};">开</text>
+            </div>
+            <div class="rd-opt rd-keep-opt" style="background-color: {{kOffBg}};" onclick="onKeep(false)">
+                <text class="rd-opt-txt" style="color: {{kOffFg}};">关</text>
+            </div>
+        </div>
+    </div>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <div class="rd-hdr">
+        <div class="rd-hdr-btn" onclick="onBack">
+            <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="rd-hdr-title">阅读设置</text>
+        <div class="rd-hdr-btn"></div>
+    </div>
+</stack>

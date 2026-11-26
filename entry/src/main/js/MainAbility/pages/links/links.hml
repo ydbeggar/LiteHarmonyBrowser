@@ -1,0 +1,41 @@
+<div class="root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <div class="hdr" style="margin-top: {{g.hdrTop}}px;">
+        <div class="hdr-btn" onclick="onBack">
+            <image class="hdr-back" src="/common/ic_back.png"></image>
+        </div>
+        <text class="hdr-title">{{title}}</text>
+        <text class="hdr-count">{{countLabel}}</text>
+    </div>
+
+    <stack class="body" style="height: {{g.bodyH}}px;">
+        <list class="list" ref="itemList" id="itemList" rotationvibrate="true" if="{{hasLinks}}" style="opacity: {{fadeOpacity}}; height: {{g.listH}}px;">
+            <list-item class="item" for="{{(index, item) in links}}" tid="href" onclick="onOpen(index)">
+                <div class="item-inner">
+                    <div class="item-text">
+                        <text class="item-title">{{item.text}}</text>
+                        <text class="item-host">{{item.sub}}</text>
+                    </div>
+                    <text class="item-arrow">›</text>
+                </div>
+            </list-item>
+        </list>
+
+        <div class="empty lwb-in" else style="height: {{g.emptyH}}px;">
+            <text class="empty-title">本页无可用链接</text>
+            <text class="empty-sub">可以返回继续阅读，或回到首页输入新地址</text>
+            <div class="empty-btn" onclick="onBack">
+                <text class="empty-btn-txt">返回阅读</text>
+            </div>
+        </div>
+    </stack>
+
+    <div class="pager">
+        <div class="pager-btn" onclick="onPrevPage">
+            <text class="pager-ic" style="color: {{prevColor}};">‹</text>
+        </div>
+        <text class="pager-label">{{pageLabel}}</text>
+        <div class="pager-btn" onclick="onNextPage">
+            <text class="pager-ic" style="color: {{nextColor}};">›</text>
+        </div>
+    </div>
+</div>

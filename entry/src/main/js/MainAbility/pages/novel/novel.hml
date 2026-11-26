@@ -1,0 +1,55 @@
+<stack class="root" style="width: {{g.w}}px; height: {{g.h}}px;">
+  <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
+    <div class="hdr-btn" onclick="goBack">
+      <image class="hdr-back" src="/common/ic_back.png"></image>
+    </div>
+    <text class="hdr-title">搜索小说</text>
+    <div class="hdr-btn hdr-btn-flat"></div>
+  </div>
+
+  <stack class="s-list" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
+    <div class="bar" style="height: {{g.barH}}px;">
+      <input class="bar-input" type="text" placeholder="输入小说名"
+             onchange="onQueryChange" />
+      <div class="bar-btn" onclick="onSearch">
+        <text class="bar-btn-txt">搜索</text>
+      </div>
+    </div>
+
+    <stack class="area" style="top: {{g.areaY}}px; height: {{g.areaH}}px;">
+      <div class="state" if="{{isLoading}}">
+        <text class="state-title">正在搜索…</text>
+        <text class="state-sub">{{query}}</text>
+      </div>
+
+      <div class="state" elif="{{isFailed}}">
+        <text class="state-title">{{failTitle}}</text>
+        <text class="state-sub">{{failSub}}</text>
+      </div>
+
+      <div class="state" else>
+        <text class="state-title">{{emptyTitle}}</text>
+        <text class="state-sub">输入小说名后点搜索</text>
+      </div>
+    </stack>
+
+    <list class="list" ref="resultList" id="resultList" rotationvibrate="true" if="{{hasResults}}" style="top: {{g.areaY}}px; height: {{g.areaH}}px;">
+      <list-item class="spacer-item">
+        <div class="spacer-box"></div>
+      </list-item>
+      <list-item class="item" style="height: {{g.itemH}}px;" for="{{(index, item) in items}}" tid="url">
+        <stack class="item-inner" style="height: {{g.innerH}}px;" onclick="onOpen(index)">
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-sub">{{item.sub}}</text>
+          <text class="item-arrow">›</text>
+        </stack>
+      </list-item>
+      <list-item class="tail-item">
+        <div class="tail-box"></div>
+      </list-item>
+    </list>
+  </stack>
+
+  <image class="shader-top" style="width: {{g.shaderTopW}}px; top: {{g.shaderTopY}}px;" src="/common/shader_top.png"></image>
+  <image class="shader" style="width: {{g.shaderW}}px; top: {{g.shaderY}}px;" src="/common/shader.png"></image>
+</stack>

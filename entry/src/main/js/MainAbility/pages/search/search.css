@@ -1,0 +1,415 @@
+/* 轻鸿浏览器 v3.1 · 搜索页 —— 单层最终值样式（C4 级联合并版）。
+   本文件由 v2.0~v2.5 四段层叠覆盖链合并而来：每个 class 只保留一条最终生效规则，
+   废弃类已全部清除（旧页头、旧摘要容器、旧加载环、旧状态行等十余条，视觉零变化）。
+   规则次序注记：同优先级后写覆盖前写——hdr-btn-flat、primary、ghost 三条
+   覆盖型规则统一放在各自基类之后。 */
+
+/* 入场动画（state 容器使用） */
+@keyframes lwb-in {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.lwb-in {
+  animation-name: lwb-in;
+  animation-duration: 280ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+/* ---------------- 根与双视图（条件分支整屏 stack + 显式坐标） ---------------- */
+.root {
+  width: 408px;
+  height: 480px;
+  background-color: #000000;
+  flex-direction: column;
+  align-items: center;
+}
+
+.view {
+  width: 408px;
+  height: 480px;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------------- 页头（两视图共用） ---------------- */
+.s-hdr {
+  width: 376px;
+  height: 52px;
+  left: 16px;
+  top: 48px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hdr-btn {
+  width: 52px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #1C1C1E;
+}
+
+/* 列表视图右侧占位钮：隐形（保持标题居中） */
+.hdr-btn-flat {
+  background-color: #000000;
+}
+
+/* 返回钮图标（v3.8）：chevron PNG 42px 居中——28px 文字字形偏小且与圆底不居中 */
+.hdr-back {
+  width: 42px;
+  height: 42px;
+}
+
+.hdr-title {
+  width: 248px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.star-ic {
+  width: 26px;
+  height: 26px;
+}
+
+/* ---------------- 摘要视图 ---------------- */
+.s-detail {
+  width: 376px;
+  height: 364px;
+  left: 16px;
+  top: 108px;
+}
+
+.d-title {
+  width: 376px;
+  height: 56px;
+  left: 0px;
+  top: 0px;
+  font-size: 21px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+
+.d-sub {
+  width: 376px;
+  height: 22px;
+  left: 0px;
+  top: 58px;
+  font-size: 15px;
+  line-height: 24px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+
+/* 摘要滚动列表（list 原生滚动；list-item/text 双显式高度——Lite 未设默认 0） */
+.d-sum-list {
+  width: 376px;
+  height: 172px;
+  left: 0px;
+  top: 84px;
+  background-color: #1C1C1E;
+  border-radius: 20px;
+}
+
+.d-sum-item {
+  width: 376px;
+  height: 120px;
+  flex-direction: column;
+}
+
+.d-summary {
+  width: 348px;
+  margin-left: 14px;
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 26px;
+  color: #FFFFFF;
+  text-overflow: clip;
+}
+
+.d-url {
+  width: 376px;
+  height: 20px;
+  left: 0px;
+  top: 262px;
+  font-size: 13px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+
+/* 「访问/返回」：y≤455 死区安全线内（v2.5 上移修复） */
+.d-foot {
+  width: 376px;
+  height: 56px;
+  left: 0px;
+  top: 286px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn {
+  width: 182px;
+  height: 56px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 28px;
+  background-color: #1C1C1E;
+}
+
+.primary {
+  background-color: #2D6CFF;
+}
+
+.btn-txt {
+  width: 172px;
+  height: 28px;
+  font-size: 20px;
+  line-height: 28px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* ---------------- 列表视图（v3.3：10 条全量滚动 + 首页同款上下渐隐帘） ---------------- */
+.s-list {
+  width: 376px;
+  height: 372px;
+  left: 16px;
+  top: 108px;
+}
+
+.s-bar {
+  width: 376px;
+  height: 60px;
+  left: 0px;
+  top: 0px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bar-input {
+  width: 242px;
+  height: 56px;
+  font-size: 20px;
+  color: #FFFFFF;
+  placeholder-color: #8E8E93;
+  background-color: #1C1C1E;
+  border-width: 0px;
+  border-radius: 28px;
+  padding-left: 20px;
+  padding-right: 14px;
+}
+
+.bar-btn {
+  width: 112px;
+  height: 56px;
+  background-color: #2D6CFF;
+  border-radius: 28px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.bar-btn-txt {
+  width: 100px;
+  height: 28px;
+  font-size: 22px;
+  line-height: 28px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+/* 结果区：list 顶部 82（abs 190）= 顶部帘（168..216）透明端内，配合 30px 引导
+   留白让首条胶囊（abs 222）落在帘外；底部延伸到 abs 478，末条可滚离底部帘 */
+.area {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 82px;
+}
+
+.state {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.state-title {
+  width: 344px;
+  height: 32px;
+  font-size: 21px;
+  line-height: 32px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.state-sub {
+  width: 344px;
+  height: 44px;
+  font-size: 15px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.list {
+  width: 376px;
+  height: 288px;
+  left: 0px;
+  top: 0px;
+  background-color: #000000;
+}
+
+/* 引导留白（首条防遮挡）与尾部留白（末条可滚离底部帘），list-item 必须显式高度 */
+.spacer-item {
+  width: 376px;
+  height: 30px;
+}
+
+.spacer-box {
+  width: 376px;
+  height: 30px;
+}
+
+.tail-item {
+  width: 376px;
+  height: 64px;
+}
+
+.tail-box {
+  width: 376px;
+  height: 64px;
+}
+
+.item {
+  width: 376px;
+  height: 88px;
+}
+
+/* 结果胶囊（v3.3 对齐修复）：376 全宽与顶部搜索框/按钮左右边界严格对齐
+   （旧 332px 居中两侧缩进 22px）；内部 stack + 显式坐标，免 padding 盒模型歧义 */
+.item-inner {
+  width: 376px;
+  height: 84px;
+  left: 0px;
+  top: 2px;
+  background-color: #1C1C1E;
+  border-radius: 42px;
+}
+
+.item-title {
+  width: 288px;
+  height: 30px;
+  left: 36px;
+  top: 16px;
+  font-size: 20px;
+  line-height: 30px;
+  color: #FFFFFF;
+  text-overflow: ellipsis;
+}
+
+.item-sub {
+  width: 288px;
+  height: 22px;
+  left: 36px;
+  top: 46px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #8E8E93;
+  text-overflow: ellipsis;
+}
+
+.item-arrow {
+  width: 32px;
+  height: 36px;
+  left: 324px;
+  top: 24px;
+  font-size: 28px;
+  line-height: 36px;
+  text-align: center;
+  color: #64B5FF;
+}
+
+/* 失败态操作行 */
+.act-row {
+  width: 344px;
+  height: 56px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.act-btn {
+  width: 164px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 26px;
+  background-color: #2D6CFF;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.ghost {
+  background-color: #1C1C1E;
+}
+
+.act-txt {
+  width: 156px;
+  height: 26px;
+  font-size: 19px;
+  line-height: 26px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* ---------------- 上下渐隐帘（v3.3，与首页同款贴图） ----------------
+   顶部帘：实心端贴搜索栏底缘 y=168 向下渐隐；底部帘：微信 shader.png 曲线 408×48@436。
+   滚动内容自下而上/自上而下渐隐入栏底与屏底，与首页观感一致。 */
+.shader-top {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 168px;
+}
+
+.shader {
+  width: 408px;
+  height: 48px;
+  left: 0px;
+  top: 436px;
+}
+
+/* ---------------- 加载动画（v3.0：common/sway.js 余弦补间驱动 left） ---------------- */
+.spin-box {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 12px;
+}
+
+.sway {
+  width: 36px;
+  height: 36px;
+  top: 18px;
+  left: 18px;
+}
+
+.sway-img {
+  width: 36px;
+  height: 36px;
+}

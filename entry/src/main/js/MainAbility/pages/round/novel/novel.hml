@@ -1,0 +1,58 @@
+<stack class="rd-root">
+  <stack class="rd-view">
+    <stack class="rd-s-list">
+      <div class="rd-bar">
+        <input class="rd-bar-input" type="text" placeholder="输入小说名"
+               onchange="onQueryChange" />
+        <div class="rd-bar-btn" onclick="onSearch">
+          <text class="rd-bar-btn-txt">搜索</text>
+        </div>
+      </div>
+
+      <stack class="rd-area">
+        <div class="rd-state lwb-in" if="{{isLoading}}">
+          <text class="rd-state-title">正在搜索…</text>
+          <text class="rd-state-sub">{{query}}</text>
+        </div>
+
+        <list class="rd-list" ref="resultList" id="resultList" rotationvibrate="true"
+              elif="{{hasResults}}">
+          <list-item class="rd-spacer-item">
+            <div class="rd-spacer"></div>
+          </list-item>
+          <list-item class="rd-item" for="{{(index, item) in items}}" tid="url">
+            <stack class="rd-item-inner" onclick="onOpen(index)">
+              <text class="rd-item-title">{{item.title}}</text>
+              <text class="rd-item-sub">{{item.sub}}</text>
+              <text class="rd-item-arrow">›</text>
+            </stack>
+          </list-item>
+          <list-item class="rd-tail-item">
+            <div class="rd-tail"></div>
+          </list-item>
+        </list>
+
+        <div class="rd-state lwb-in" elif="{{isFailed}}">
+          <text class="rd-state-title">{{failTitle}}</text>
+          <text class="rd-state-sub">{{failSub}}</text>
+        </div>
+
+        <div class="rd-state lwb-in" else>
+          <text class="rd-state-title">{{emptyTitle}}</text>
+          <text class="rd-state-sub">输入小说名后点搜索</text>
+        </div>
+      </stack>
+    </stack>
+
+    <image class="rd-mask-top" src="/common/round_mask_top.png"></image>
+    <image class="rd-mask-bottom" src="/common/round_mask_bottom.png"></image>
+
+    <div class="rd-hdr">
+      <div class="rd-hdr-btn" onclick="goBack">
+        <image class="rd-hdr-back" src="/common/ic_back.png"></image>
+      </div>
+      <text class="rd-hdr-title">搜索小说</text>
+      <div class="rd-hdr-btn rd-hdr-btn-flat"></div>
+    </div>
+  </stack>
+</stack>

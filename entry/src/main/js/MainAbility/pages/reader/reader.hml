@@ -1,0 +1,156 @@
+<stack class="root" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd" style="width: {{g.w}}px; height: {{g.h}}px;">
+    <div class="rpage" style="width: {{g.w}}px; height: {{g.h}}px;">
+        <div class="hdr" style="margin-top: {{g.hdrTop}}px;">
+            <div class="hdr-btn" onclick="onBack">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="hdr-title">{{title}}</text>
+            <div class="hdr-btn" onclick="onToggleBookmark">
+                <image class="star-ic" src="{{starIcon}}"></image>
+            </div>
+        </div>
+
+        <stack class="body" style="height: {{g.bodyH}}px; margin-top: {{g.bodyMtop}}px;">
+            <div class="state lwb-in" if="{{isLoading}}" style="height: {{g.stateH}}px;">
+                <stack class="spin-box" style="margin-bottom: {{g.spinGap}}px;">
+                    <stack class="sway" style="left: {{swayLeft}}px;">
+                        <image class="sway-img" src="/common/ic_search.png"></image>
+                    </stack>
+                </stack>
+                <text class="state-title">正在加载正文…</text>
+                <text class="state-sub" style="height: {{g.stateSubH}}px;">{{loadingUrl}}</text>
+                <!-- 加载进度（v3.8）：fetch 无传输进度事件——时间估值爬升 + 真实秒数 -->
+                <div class="load-track" style="margin-top: {{g.loadGap}}px;">
+                    <div class="load-fill" style="width: {{loadBarW}}px;"></div>
+                </div>
+                <text class="load-label">{{loadLabel}}</text>
+            </div>
+
+            <div class="page-wrap" elif="{{isOk}}" style="height: {{g.bodyH}}px;">
+                <div class="title-view lwb-in" if="{{showStart}}" style="height: {{g.bodyH}}px;">
+                    <text class="tv-title" style="height: {{g.tvTitleH}}px;">{{title}}</text>
+                    <text class="tv-intro" style="height: {{g.tvIntroH}}px;">{{pageText}}</text>
+                    <div class="tv-btn primary" onclick="onStartRead" style="height: {{g.tvBtnH}}px;">
+                        <text class="tv-btn-txt">开始阅读 ›</text>
+                    </div>
+                    <div class="tv-btn ghost" onclick="onOpenLinks" style="height: {{g.tvBtnH}}px;">
+                        <text class="tv-btn-txt2">目录</text>
+                    </div>
+                </div>
+                <stack class="page-stack" else style="height: {{g.textH}}px;">
+                    <text class="page-text lwb-turn" if="{{layerB}}"
+                          style="font-size: {{fontSizePx}}px; line-height: {{lineHeightPx}}px; height: {{g.textH}}px;">{{pageTextB}}</text>
+                    <text class="page-text lwb-turn" else
+                          style="font-size: {{fontSizePx}}px; line-height: {{lineHeightPx}}px; height: {{g.textH}}px;">{{pageTextA}}</text>
+                    <div class="zone-top" onclick="onPrev" style="height: {{g.zoneTopH}}px;"></div>
+                    <div class="zone-bottom" onclick="onNext" style="top: {{g.zoneBottomTop}}px; height: {{g.zoneBottomH}}px;"></div>
+                    <!-- 章末三键导航行（v3.3）：上一章 / 目录 / 下一章，stack+显式坐标（条件块不入 flex 流） -->
+                    <stack class="nav-row" if="{{showNav}}" style="top: {{g.navTop}}px;">
+                        <div class="nav-btn nav-prev" if="{{hasPrev}}" onclick="onPrevChapter">
+                            <text class="nav-btn-txt">‹ 上一章</text>
+                        </div>
+                        <div class="nav-btn nav-toc" onclick="onOpenLinks">
+                            <text class="nav-btn-txt">目录</text>
+                        </div>
+                        <div class="nav-btn nav-next" if="{{hasNext}}" onclick="onNextChapter">
+                            <text class="nav-btn-txt">下一章 ›</text>
+                        </div>
+                    </stack>
+                </stack>
+            </div>
+
+            <div class="state lwb-in" elif="{{isEmpty}}" style="height: {{g.stateH}}px;">
+                <text class="state-title">未识别到正文</text>
+                <text class="state-sub" style="height: {{g.stateSubH}}px;">该页面可能以图片或脚本渲染，可尝试查看链接列表</text>
+                <div class="act-row">
+                    <div class="act-btn" onclick="onOpenPanel">
+                        <text class="act-txt">操作</text>
+                    </div>
+                    <div class="act-btn ghost" onclick="onGoHome">
+                        <text class="act-txt">返回</text>
+                    </div>
+                </div>
+            </div>
+
+            <div class="state lwb-in" else style="height: {{g.stateH}}px;">
+                <text class="state-title">{{failTitle}}</text>
+                <text class="state-sub" style="height: {{g.stateSubH}}px;">{{failSub}}</text>
+                <div class="act-row">
+                    <div class="act-btn" onclick="onRetry">
+                        <text class="act-txt">重试</text>
+                    </div>
+                    <div class="act-btn ghost" onclick="onGoHome">
+                        <text class="act-txt">返回首页</text>
+                    </div>
+                </div>
+            </div>
+        </stack>
+
+        <text class="page-foot">{{pageLabel}}</text>
+    </div>
+
+    <!-- 工具页：与首页大胶囊完全同款（图标 + 主标题居中），list 滚动 -->
+    <stack class="panel-page lwb-slide" if="{{panelOpen}}" style="width: {{g.panelW}}px; height: {{g.panelH}}px;">
+        <stack class="panel-head" style="left: {{g.panelHeadX}}px; top: {{g.panelHeadTop}}px;">
+            <div class="hdr-btn ph-back" onclick="onClosePanel">
+                <image class="hdr-back" src="/common/ic_back.png"></image>
+            </div>
+            <text class="panel-title">操作</text>
+            <div class="hdr-btn hdr-btn-flat ph-right"></div>
+        </stack>
+
+        <list class="panel-list" ref="toolList" id="toolList" rotationvibrate="true" style="left: {{g.panelListX}}px; top: {{g.panelListY}}px; height: {{g.panelListH}}px;">
+            <!-- 引导留白：首条工具下移到顶部渐隐帘（100..148）透明端之外，未滑动不被遮挡 -->
+            <list-item class="spacer-item">
+                <div class="spacer-box"></div>
+            </list-item>
+
+            <list-item class="mi">
+                <stack class="cap" onclick="onOpenLinks">
+                    <stack class="cap-ico">
+                        <image class="cap-img" src="/common/ic_link.png"></image>
+                    </stack>
+                    <text class="cap-txt">链接</text>
+                </stack>
+            </list-item>
+
+            <list-item class="mi">
+                <stack class="cap" onclick="onToggleBookmark">
+                    <stack class="cap-ico">
+                        <image class="cap-img" src="{{starIcon}}"></image>
+                    </stack>
+                    <text class="cap-txt">{{saveLabel}}</text>
+                </stack>
+            </list-item>
+
+            <list-item class="mi">
+                <stack class="cap" onclick="onSaveOffline">
+                    <stack class="cap-ico">
+                        <image class="cap-img" src="/common/ic_save.png"></image>
+                    </stack>
+                    <text class="cap-txt" style="color: {{saveOffColor}};">{{saveOffLabel}}</text>
+                    <div class="sv-track" style="background-color: {{saveTrackBg}};"></div>
+                    <div class="sv-fill" style="width: {{saveBarW}}px;"></div>
+                </stack>
+            </list-item>
+
+            <list-item class="mi">
+                <stack class="cap" onclick="onOpenSettings">
+                    <stack class="cap-ico">
+                        <image class="cap-img" src="/common/ic_gear.png"></image>
+                    </stack>
+                    <text class="cap-txt">设置</text>
+                </stack>
+            </list-item>
+
+            <list-item class="mi">
+                <div class="tail-space"></div>
+            </list-item>
+        </list>
+
+        <!-- 底部高斯模糊式渐变贴图（微信 shader.png 同款，v2.8 补入工具页） -->
+        <image class="shader" src="/common/shader.png" style="width: {{g.shaderW}}px; top: {{g.shaderY}}px;"></image>
+        <!-- 顶部渐隐帘（与首页同款镜像贴图；实心端贴「操作」标题底缘，向下渐隐） -->
+        <image class="shader-top" src="/common/shader_top.png" style="width: {{g.shaderTopW}}px; top: {{g.shaderTopY}}px;"></image>
+    </stack>
+</stack>
