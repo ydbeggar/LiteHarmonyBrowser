@@ -7,7 +7,10 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Hap = "dist\unsigned\LiteHarmonyBrowser-v1.1.2-unsigned-final.hap"
+  [string]$Hap = "dist\unsigned\LiteHarmonyBrowser-v1.1.2-unsigned-final.hap",
+  # v1.1.3：正式产物默认不含 jerry-snapshot 字节码 .bc（运行时解析同名 .js）。
+  # 只有在做 -KeepBytecode 对照构建时才加 -AllowBytecode。
+  [switch]$AllowBytecode
 )
 
 $ErrorActionPreference = "Stop"
@@ -55,12 +58,19 @@ try {
     $fail += 1
   }
 
-  $bcMissing = @($pageJs | Where-Object {
-    $bin = $_.Substring(0, $_.Length - 3) + '.bc'
-    -not $entries.ContainsKey($bin)
-  })
-  Write-Host "无 .bc 的页面（信息）：$($bcMissing.Count)"
-  $bcMissing | ForEach-Object { Write-Host "  $_" }
+  $bc = @($entries.Keys | Where-Object { $_ -match '\.bc$' })
+  Write-Host "字节码 .bc : $($bc.Count) 个"
+  if ($AllowBytecode) {
+    $bcMissing = @($pageJs | Where-Object {
+      $bin = $_.Substring(0, $_.Length - 3) + '.bc'
+      -not $entries.ContainsKey($bin)
+    })
+    Write-Host "无 .bc 的页面（信息，-AllowBytecode）：$($bcMissing.Count)"
+  } elseif ($bc.Count -gt 0) {
+    Write-Host "正式产物不应包含 .bc（运行时统一解析 .js）：" -ForegroundColor Red
+    $bc | ForEach-Object { Write-Host "  $_ ($([math]::Round($entries[$_] / 1KB, 1)) KB)" }
+    $fail += 1
+  }
 } finally {
   $zip.Dispose()
 }
@@ -68,4 +78,4 @@ try {
 if ($fail -gt 0) {
   throw "构建检查失败（$fail 项）"
 }
-Write-Host "构建检查通过：BIN-only / 双端页面齐全 / 页面 JS 体积合规" -ForegroundColor Green
+Write-Host "构建检查通过：BIN-only / 无字节码 / 双端页面齐全 / 页面 JS 体积合规" -ForegroundColor Green
