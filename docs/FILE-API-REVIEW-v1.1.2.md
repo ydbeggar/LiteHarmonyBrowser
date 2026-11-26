@@ -153,7 +153,7 @@ internal://app/doc/list.txt     最近 N 篇索引（LRU，单文件）
 | 冒烟 | `node tools/smoke.js` | 146/146 通过 | 文件 mock 不等于真机 |
 | DevEco 构建 | hvigor release / API 6.1.1.125 | BUILD SUCCESSFUL | 页面快照部分缺失（index/reader/ai/rss）为体积告警 |
 | HAP 检查 | `tools/verify-build.ps1` | 0 PNG；双端 ai/rss 页面齐全；页面 JS <112KB | 应用图标 `.bin` 的启动器兼容性未上表 |
-| Lite 模拟器 | 408×480 / pages/index、settings、ai | 手动 Simulator 卡在 `current state(2) invalid`，黑屏 | 模拟器不能证明 file API/rawfile/图片释放 |
+| Lite 模拟器 | 408×480 与 466×466 / index、settings、ai、rss | **通过 init 渲染**：用 `Simulator.exe -lws` WebSocket 帧拿到真实 JPEG；首页/设置/AI/RSS 布局已核对，RSS 无网络时错误态正常 | `onShow`、点击、定时器不派发；不能证明 file API/rawfile/图片释放 |
 | 真机 | FIT 5 Pro / GT | 未执行 | **发布阻塞项**：文件 API、rawfile、迁移、AI/RSS |
 
 ## 六、结论

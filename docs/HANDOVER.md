@@ -638,7 +638,8 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 ### 4. 验证边界
 
 - 已执行：146/146 冒烟、release 构建、HAP 0 PNG/双端页面/JS 体积检查、RSS 真实源 PC 解析（5 源均出条目）、DeepSeek Search/Fetch 直连实测。
-- 未执行：FIT 5 Pro / GT 真机上的 API Key 持久化、AI 两端布局与超时、RSS 5 源手表网络、文件 API 字节语义、应用图标 `.bin` 启动器兼容性；手动 Lite Simulator 卡在 `current state(2) invalid`，只能验证 init 渲染，不能作为文件 API 证据。
+- 未执行：FIT 5 Pro / GT 真机上的 API Key 持久化、AI 交互与超时、RSS 5 源手表网络、文件 API 字节语义、应用图标 `.bin` 启动器兼容性。
+- Lite Simulator：直启窗口黑屏，但通过 `Simulator.exe -lws <port>` 的 WebSocket 二进制帧已抓取首页/增强搜索/RSS 的 408×480 与 466×466 init 渲染截图（`交付-轻鸿浏览器-v1.1.2\证据-模拟器-*.png`）；`onShow`、点击、定时器不派发，不能作为文件 API/图片释放证据。
 - 发布前必须补：签名 HAP 真机安装、首次/二次启动、Key 清除重填、AI 超时/402/429、RSS 源逐项、`internal://app/` 写入/读取/迁移、图片释放。
 
 ## 六、待办（按优先级）
@@ -706,7 +707,8 @@ pwsh -File tools\pack-app.ps1
 - **卡死后必须重启手表**（安装器进程残留会导致后续安装全部失败）；
 - **jerry-snapshot 工具堆只有 64KB**：构建时单页编译产物超过约 45KB 源码会报 `ERR_OUT_OF_MEMORY`、`.bc` 快照缺失（运行时退回解析 .js，功能正常但冷启动慢）。**改 reader.js / html.js / store.js 等大模块后必须确认 `reader.bc` 重新生成**（构建日志出现 `Failed to convert the reader.js file to a snapshot` 即中招），瘦身方向参考 1.4.0：把只被单页用的辅助函数移出 common；
 - 构建前若 `entry/build` 里残留调试文件（如模拟器字体 `config/SourceHanSansSC-Regular.otf` 17MB）会被打进 hap，**定期清理 `entry/build`**；
-- 模拟器手动启动（`Simulator.exe` 直启）时页面停在 `current state(2) is invalid`，`onShow`、`setTimeout` 和点击事件都不派发，只能验证 init 阶段的渲染；
+- **release 构建被旧 `entry/build` 缓存污染时，页面 JS 会从 50KB 级膨胀到 170KB 级并触发 112KB 安装上限**；`tools/verify-build.ps1` 会报“页面 JS 超过 112KB”。处理：删除 `entry\build` 后重新运行 `pwsh -File tools\build.ps1`，不要直接改产物；
+- 模拟器手动启动（`Simulator.exe` 直启）窗口为黑屏控制台，页面停在 `current state(2) is invalid`，`onShow`、`setTimeout` 和点击事件都不派发；但用 `-lws <port>` 的 WebSocket 二进制帧可以拿到真实页面 JPEG，只用于 init 渲染/布局验证；
 - 调试用的模拟器字体路径：SDK 的 `previewer\liteWearable\bin\config\`（工作目录设为 bin 才能加载）；
 - 分页与 `list` 组件同时使用时，**页面只渲染当前页切片**（`data.items` / `data.links` 是切片，不是全量），`onOpen(index)` 的 `index` 是切片内下标，不要拿它去索引全量数组。
 
