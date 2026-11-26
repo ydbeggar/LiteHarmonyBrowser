@@ -20,8 +20,8 @@
 | 本地存储 | `@system.file` 单文件数据集（store v3.4：bm/hs/pf.txt，3900B 自截断）；`fsutil` 全局 FIFO 串行 + 16ms 调用间隔；离线正文 `saved.js`（UTF-8 字节双层分片、单次保存 ≤6 次调用）；P3 章文件 `internal://app/read/<key>.txt/.idx`（仅完整档）；AI 正文 `internal://app/ai/` 分片（空终止片，首写不再清理 24 个旧片）；API Key 用 `@system.storage` 持久化；网页缓存已删除（v3.3） |
 | 小说站导航 | `common/navrule.js` + `html.js` 提取 `startHref`（「开始阅读」类）与 `chapters`（「第x章」类，≤40 条、章节优先）；reader 书名/目录页给「开始阅读 ›」「目录」直达控件；「上一章/下一章」走原有 NEXT/PREV 词表；links 页章节置顶 |
 | 构建产物 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（58 条目，0 PNG）与同名 `.app`（3 条目） |
-| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（534,115 B）与同名 `.app`（521,540 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
-| SHA256 | hap `D73CFD51AEE183032E256B8905507470F8DA7921A21B158AA55235C24D92F187`<br>app `3A84DAAE35732B5B574512833B005DFBBFCB7C942075093270E2BBE979932E8E` |
+| 交付包 | `dist/unsigned/LiteHarmonyBrowser-v1.1.2-unsigned-final.hap`（531,571 B）与同名 `.app`（520,199 B）；交付目录见 `轻鸿蒙开发\交付-轻鸿浏览器-v1.1.2` |
+| SHA256 | hap `FC914EB64A83CD2C81B16D4FB83BB74FF8EDDDF004271C4332AC58E6C4879491`<br>app `0796FA6FFEBCC0FBDF79FB8E0F0C2C3C8A5D702ADBFE40F724F5EDC3FA000F3D` |
 | 签名 | `build-profile.json5` 已配置手动签名 `signingConfigs`（fit5pro.p12 / .cer / .p7b，SHA256withECDSA），**未绑定 product**，命令行只出未签名包；真机安装须用 **bin 格式 HAP**（见五之三十七） |
 | 档位 | compile `26.0.0` / target `5.0.0(12)` / compatible `4.0.0(10)` / minPlatformVersion 10 |
 
@@ -631,8 +631,8 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 
 - `pwsh -File tools/build.ps1`：冒烟（148 条）→ hvigor release → `pack-app.ps1` → `verify-build.ps1`。
 - 当前未签名产物（2026-11-26 17:50 构建）：
-  - HAP `534,115 B`，58 条目，页面图 0 PNG（系统图标 2 PNG 装机必需），SHA256 `D73CFD51AEE183032E256B8905507470F8DA7921A21B158AA55235C24D92F187`；
-  - APP `521,540 B`，SHA256 `3A84DAAE35732B5B574512833B005DFBBFCB7C942075093270E2BBE979932E8E`。
+  - HAP `531,571 B`，58 条目，0 PNG（icon.bin，对齐第一版可装结构），SHA256 `FC914EB64A83CD2C81B16D4FB83BB74FF8EDDDF004271C4332AC58E6C4879491`；
+  - APP `520,199 B`，SHA256 `0796FA6FFEBCC0FBDF79FB8E0F0C2C3C8A5D702ADBFE40F724F5EDC3FA000F3D`。
 - 构建时 `index.js`、`reader.js`、`ai.js`、`search.js`、`rss.js` 等页面快照可能缺失（jerry-snapshot 64KB 堆），运行会退回解析 `.js`，功能不受影响；页面 JS 均 <112KB。
 
 ### 4. 验证边界
@@ -704,7 +704,7 @@ pwsh -File tools\pack-app.ps1
 
 ## 八、已知风险与坑
 
-- **手表安装失败（v1.1.2 真机反馈）的两个根因**：① **单页 JS 体积**——reader.js 引入增强抓取后涨到 108KB（约 111KB），超单页安装安全线即装不上；上一轮 96KB 可装。**修复**：把「增强模式抓网页正文」移到 search.js 预抓（DeepSeek Fetch→aistore→reader 读 aiKey），reader.js 不引入 Aiclient/Md，保持 ~96KB。② **应用启动图标必须 PNG**——`resources/base/media/icon_small.png`（92×92）缺失或被转 .bin 会装不上（HANDOVER 早有记录）。**修复**：应用图标保留 PNG、resources.index 指向 PNG；仅 `assets/js/**` 页面图做 BIN-only。真机装机验证前，勿单页 JS 超 ~100KB、勿把应用图标转 BIN。
+- **手表安装失败/崩溃（v1.1.2 真机反馈）的两个根因**：① **单页 JS 体积**——reader.js 引入增强抓取后涨到 108KB，超单页安装线即装不上；**修复**：把「增强模式抓网页正文」移到 search.js 预抓（DeepSeek Fetch→aistore→reader 读 aiKey），reader.js 不引入 Aiclient/Md，保持 ~96KB。② **打包结构必须对齐第一版**——第一版 v1.1.2（`c3979f6`）用 `icon.bin` + 剥离 PNG + `resources.index`→icon.bin 才正常；中途误改成 `icon.png` 反而触发崩溃。**修复**：回退到 `c3979f6` 的 pack-app 打包处理。教训：改 `pack-app.ps1` 的图标/资源处理前，先对比「已知可正常安装」的那版产物结构，勿凭 `icon_small.png` 旧文档臆断（实测 `icon.bin` 可用）。
 
 - **卡死后必须重启手表**（安装器进程残留会导致后续安装全部失败）；
 - **jerry-snapshot 工具堆只有 64KB**：构建时单页编译产物超过约 45KB 源码会报 `ERR_OUT_OF_MEMORY`、`.bc` 快照缺失（运行时退回解析 .js，功能正常但冷启动慢）。**改 reader.js / html.js / store.js 等大模块后必须确认 `reader.bc` 重新生成**（构建日志出现 `Failed to convert the reader.js file to a snapshot` 即中招），瘦身方向参考 1.4.0：把只被单页用的辅助函数移出 common；
@@ -720,6 +720,7 @@ pwsh -File tools\pack-app.ps1
 - `docs/install.md`：安装流程与签名命令（部分历史结论已过时，见第六节第 4 条）
 - `spec/lite-web-reader/{spec,plan,tasks}.md`：需求/设计/任务（Phase 1~9 全部完成）
 - 技能规范：`memory-and-runtime.md`（性能基线 + JS 体积边界）、`device-compatibility.md`（FIT 5 Pro 实测档案）
+
 
 
 
