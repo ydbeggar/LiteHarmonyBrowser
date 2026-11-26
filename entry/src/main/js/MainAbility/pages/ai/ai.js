@@ -20,6 +20,8 @@ import Crown from '../../common/crown.js';
 import Search from '../../common/search.js';
 
 var READER_PAGE = 'pages/reader/reader';
+/* v1.1.3：DeepSeek Fetch 正常启用。真机崩溃根因是本地文件写入（Aistore 旧分片
+   17 次调用），已改单文件（2 次调用），非 fetch 本身问题。 */
 
 function clampText(s, max) {
   var v = s === null || s === undefined ? '' : String(s);
@@ -53,7 +55,7 @@ export default {
     });
     this.waitTimer = 0;
     this.waitSec = 0;
-    this.maxText = 16000;
+    this.maxText = 12000;
     /* v1.1.3：输入框值存非响应式属性，避免每次按键触发 setData（GT6 输入法内存尖峰崩溃） */
     this._keyInput = '';
     this._query = '';
@@ -79,9 +81,9 @@ export default {
       that.isSearch = cfg.enabled;
       that.isLoading = false;
       that.isFailed = false;
-      if (cfg.enabled) {
-        that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
-      }
+      /* v1.1.3 内存收紧：AI 正文上限与普通阅读一致（去掉额外余量），
+         降低 fetch/存储/显示的峰值内存 */
+      that.maxText = Layout.net().maxText;
     });
   },
 
@@ -129,7 +131,7 @@ export default {
       that.isSetup = false;
       that.isSearch = true;
       that.isFailed = false;
-      that.maxText = Layout.net().maxText + (Layout.isRound() ? 2000 : 4000);
+      that.maxText = Layout.net().maxText;
     });
   },
 
@@ -180,7 +182,7 @@ export default {
         that.showFail('请输入网址', '网址以 http(s):// 开头');
         return;
       }
-      /* 「搜网页」：直接用 DeepSeek Fetch 拉取网页正文 */
+      /* 「搜网页」：DeepSeek Fetch 拉取网页正文（存储已改单文件，调用次数已控） */
       var url = q;
       if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
         url = 'https://' + url;
