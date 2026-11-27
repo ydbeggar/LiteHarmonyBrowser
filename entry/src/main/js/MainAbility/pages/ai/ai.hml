@@ -1,6 +1,6 @@
 <stack class="root" style="width: {{g.w}}px; height: {{g.h}}px;" onswipe="onSwipe" ontouchstart="onTouchStart" ontouchend="onTouchEnd">
     <!-- API Key 设置 -->
-    <stack class="view" if="{{isSetup}}">
+    <stack class="view" show="{{isSetup}}">
         <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
             <div class="hdr-btn" onclick="onBack">
                 <image class="hdr-back" src="/common/ic_back.png"></image>
@@ -12,7 +12,7 @@
         <stack class="setup" style="left: {{g.listX}}px; top: {{g.listY}}px; height: {{g.listH}}px;">
             <text class="setup-title">启用 DeepSeek 增强搜索</text>
             <text class="setup-hint">需要 DeepSeek API Key。键盘没有“-”也没关系：直接输入 sk 后面的内容，保存时自动补 sk-；Key 只保存在本地。</text>
-            <input class="key-input" type="password" placeholder="输入 sk 后面的内容（无需 -）" onchange="onKeyChange" />
+            <input class="key-input" type="text" placeholder="输入 sk 后面的内容（无需 -）" onchange="onKeyChange" />
             <div class="btn primary setup-btn" onclick="onSaveKey">
                 <text class="btn-txt">保存并启用</text>
             </div>
@@ -25,7 +25,7 @@
     </stack>
 
     <!-- 搜索/阅读 -->
-    <stack class="view" elif="{{isSearch}}">
+    <stack class="view" show="{{isSearch}}">
         <div class="hdr" style="left: {{g.hdrX}}px; top: {{g.hdrY}}px;">
             <div class="hdr-btn" onclick="onBack">
                 <image class="hdr-back" src="/common/ic_back.png"></image>
