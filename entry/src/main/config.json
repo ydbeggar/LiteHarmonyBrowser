@@ -7,8 +7,8 @@
       "name": "1.1.2"
     },
     "apiVersion": {
-      "compatible": 50000012,
-      "target": 60100023,
+      "compatible": 40000010,
+      "target": 50000012,
       "releaseType": "Release"
     }
   },
