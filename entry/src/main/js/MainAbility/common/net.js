@@ -267,7 +267,7 @@ function request(url, cb, opts) {
         header['Accept'] = 'application/json,text/plain,*/*';
       }
       if (!header['User-Agent']) {
-        header['User-Agent'] = 'LiteHarmonyBrowser/1.1.2';
+        header['User-Agent'] = 'LiteHarmonyBrowser/1.1.3';
       }
       fetch.fetch({
         url: url,

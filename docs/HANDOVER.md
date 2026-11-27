@@ -717,6 +717,45 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 - **局部只留 `.bc`（11 页删 `.js`）**：体积只能降到 ≈405 KB（-23%），比全 `.js` 多 75 KB，还引入「包内两种加载方式」的差异，不采用。
 - 代价：去掉 `.bc` 后每个页面首次进入多一次源码解析（30–43 KB 源码约 5–20 ms），真机体感无差异。
 
+## 五之四十四、v1.1.3：apiVersion 对齐 API 23（2026-11-27）
+
+### 1. 背景
+
+- 用户确认：本应用实际使用的最低机型均为 **HarmonyOS 6.1.0 / API 23**。
+- v1.1.2 的 `compatibleSdkVersion = 4.0.0(10)`、`targetSdkVersion = 5.0.0(12)` 属历史保守配置，与真实设备不符；`manifest.json` 的 `minPlatformVersion` 因此长期是 10。
+
+### 2. 改动（v1.1.3）
+
+| 项 | v1.1.2 | v1.1.3 |
+|---|---|---|
+| `compatibleSdkVersion` | `4.0.0(10)` → `40000010` | **`6.1.0(23)` → `60100023`** |
+| `targetSdkVersion` | `5.0.0(12)` → `50000012` | **`6.1.0(23)` → `60100023`** |
+| `manifest.minPlatformVersion` | 10 | **23** |
+| `versionCode / versionName` | 1102 / 1.1.2 | **1103 / 1.1.3** |
+| `compileSdkVersion` | `26.0.0`（未变） | `26.0.0` |
+
+- 代码逻辑零改动，仅版本号字符串（`index.js` 的 `APP_VERSION`、`net.js` 的 UA）与配置。
+- `build-profile.json5`（本机）与 `build-profile.example.json5`（仓库模板）同步改为 23，避免新机器 clone 后又回到 API 10。
+- `tools/verify-build.ps1` 默认产物路径改为 v1.1.3。
+
+### 3. 收益与代价
+
+- 收益：声明与实际一致；旧平台设备不会「装上后异常」而是直接拒装；满足应用市场对 target 的常规要求；将来使用 API 23+ 能力不会被 `compatible` 拦住。
+- 代价：**API < 23 的手表无法安装**。项目使用的 `@system.*` 能力均 ≤ API 9，因此没有功能/性能收益，纯粹是版本声明与安装门槛的调整。
+- 风险点：`minPlatformVersion` 由 10 变 23 后，安装器会做版本校验；需真机确认安装不报 error 40/31。
+
+### 4. 产物
+
+- 清空 `entry\build` 全量 release 构建：HAP **329,816 B**（47 条目、0 PNG、0 `.bc`）/ SHA256 `C5CFE0FCD4CEBAE3B6BB6EFE4DB1B5D29F09A5A1EE2551E3283E5C4339FEA438`；APP **319,206 B** / SHA256 `2B09772A45ECA4170778CB683BFF33FC616DC061888F199D1D98B3146AADA173`。
+- 冒烟 147/147、`verify-build` 通过（0 PNG / 0 `.bc` / 双端页面 / JS <112 KB，reader 97.3 KB）。
+- 产物实测：`config.json` `apiVersion` compatible=target=`60100023`；`manifest.json` `minPlatformVersion=23`；`pack.info` version 1103/1.1.3。
+
+### 5. 可复用要点
+
+- 改 apiVersion 只改 `build-profile.json5` 的 `targetSdkVersion` / `compatibleSdkVersion`，源 `config.json` 的 `apiVersion` 会被 hvigor 覆盖（改它不影响产物，但应保持同步以免误导）。
+- `6.1.0(23)` 编码规则：主版本×10^7 + 次版本×10^5 + 补丁×10^3 + API 号 → `60100023`；据此 `4.0.0(10)`=`40000010`、`5.0.0(12)`=`50000012`。
+- 本机仅有 SDK `26.0.0`（API 26），target 设 23 属「高 compSdk + 低 target」的正常组合，hvigor 不报错。
+
 ## 六、待办（按优先级）
 
 > **2026-11-26 更新**：当前优先项已变为 **v1.1.1 GT 受限档真机回归 + FIT5 完整档 P2/P3 回归**（见五之四十第 8~9 条与 `交付-真机待验清单-v1.0.8-P2P3.md`）。以下 0~6 为 v1.0.3/v1.0.7 历史待办，除 bin 安装链路外多数已被后续版本覆盖，保留作背景。

@@ -12,7 +12,7 @@ var SEARCH_PAGE = 'pages/search/search';
 var OFFLINE_PAGE = 'pages/offline/offline';
 /* 关于页显示的版本号：与 AppScope/app.json5、entry/src/main/config.json 同步
    （smoke.js 有三处一致性用例，改动版本号时三处一起改） */
-var APP_VERSION = 'Release V1.1.2';
+var APP_VERSION = 'Release V1.1.3';
 
 export default {
   data: {

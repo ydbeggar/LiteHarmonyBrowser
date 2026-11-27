@@ -7,7 +7,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Hap = "dist\unsigned\LiteHarmonyBrowser-v1.1.2-unsigned-final.hap",
+  [string]$Hap = "dist\unsigned\LiteHarmonyBrowser-v1.1.3-unsigned-final.hap",
   # v1.1.3：正式产物默认不含 jerry-snapshot 字节码 .bc（运行时解析同名 .js）。
   # 只有在做 -KeepBytecode 对照构建时才加 -AllowBytecode。
   [switch]$AllowBytecode
