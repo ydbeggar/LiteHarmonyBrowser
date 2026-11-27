@@ -1,7 +1,7 @@
 # 轻鸿浏览器（LiteHarmonyBrowser）
 
 > 运行在华为 Lite Wearable 手表上的纯 JS 文本浏览器 / 小说阅读器。
-> 当前版本：**1.1.3（versionCode 1103）** ｜ 包名：`com.example.litewearbrowser`
+> 当前版本：**1.1.4（versionCode 1104）** ｜ 包名：`com.example.litewearbrowser`
 > 目标设备：HUAWEI WATCH FIT 5 Pro（408×480 方屏）+ GT 系列（466×466 圆屏）
 
 ## 一、这是什么
@@ -21,7 +21,7 @@
 
 每个版本的**未签名 `.app`** 可在仓库的 [Releases](https://github.com/ydbeggar/LiteHarmonyBrowser/releases) 页面下载。由于 GitHub 不允许直接上传 `.app` 扩展名，附件以 zip 封装，文件名形如 `LiteHarmonyBrowser-v1.1.2-unsigned-final.app.zip`，解压后得到同名 `.app`。
 
-当前最新 v1.1.3：解压后 `.app` 319,206 B，SHA256 `2B09772A45ECA4170778CB683BFF33FC616DC061888F199D1D98B3146AADA173`。
+当前最新 v1.1.4：解压后 `.app` 319,162 B，SHA256 `959AFD53361A382B5418EFA67FF863FA2D23B7627BFA92FBD710F847439A66CC`。
 
 未签名包需使用 DevEco Studio 配置本机签名后再安装或上架；仓库内 `dist/unsigned/` 同时保留了历史未签名 `.hap` / `.app`。
 
@@ -48,7 +48,7 @@ pwsh -File tools\build.ps1
 
 ## 五、Git 使用
 
-默认分支 `main`，已有标签 `v1.1.1`、`v1.1.2`、`v1.1.3`。
+默认分支 `main`，已有标签 `v1.1.1`、`v1.1.2`、`v1.1.3`、`v1.1.4`。
 
 ```powershell
 git clone https://github.com/ydbeggar/LiteHarmonyBrowser.git

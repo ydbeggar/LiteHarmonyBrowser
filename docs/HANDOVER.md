@@ -756,6 +756,59 @@ v2.8 真机反馈：「轻鸿浏览器」标题下方一条黑色遮罩割裂。
 - `6.1.0(23)` 编码规则：主版本×10^7 + 次版本×10^5 + 补丁×10^3 + API 号 → `60100023`；据此 `4.0.0(10)`=`40000010`、`5.0.0(12)`=`50000012`。
 - 本机仅有 SDK `26.0.0`（API 26），target 设 23 属「高 compSdk + 低 target」的正常组合，hvigor 不报错。
 
+## 五之四十五、v1.1.4：Key 设置页输入框无法调起输入法（2026-11-27，真机确认修复）
+
+### 1. 现象
+
+- v1.1.3 与 v1.1.2 最终版：进入「增强搜索 → 设置 → 点 API Key 输入框」**不弹出输入法**，无法输入。
+- 早期**未内置默认 API Key** 的 v1.1.2 版本：可以正常调起并输入。
+
+### 2. 根因（两个，叠加）
+
+**（1）`if` 条件渲染导致输入框「后构建」——主因**
+
+Lite HML 官方语义（`references/hml-lite-syntax.md`）：
+
+| 属性 | 语义 |
+|---|---|
+| `if` | true 添加元素，**false 移除元素（不构建 vdom）** |
+| `show` | true 显示，false 隐藏（**仍构建 vdom**，仅 `display:none`） |
+
+- 早期无默认 Key：`Aicfg.load` 的 `enabled=false` → 首帧 `isSetup=true` → Key 设置视图**在页面首次渲染时构建**，`input` 随之创建 → 可拉起输入法。
+- `f130366` 内置默认 Key 后：`k = saved || DEFAULT_KEY` 使 `enabled` 恒 true → 首帧 `isSetup=false` → 设置视图**从未构建**；点「设置」改 `isSetup=true` 时才创建 `input` → **Lite 不为后创建的 input 注册输入法**，点击无反应。
+
+**（2）`type="password"` 不在 Lite 支持列表——次因**
+
+Lite `input` 专属属性仅 `type / checked / name / value`，`type` 只支持 `button / checkbox / radio / text`，文档明确「**text 仅支持输入法的真机可拉起输入界面**」。项目自 v1.1.2 起一直写 `password`，属历史遗留。
+
+### 3. 修复
+
+```diff
+- <stack class="view" if="{{isSetup}}">      + <stack class="view" show="{{isSetup}}">
+- <stack class="view" elif="{{isSearch}}">   + <stack class="view" show="{{isSearch}}">
+- <input class="key-input" type="password"   + <input class="key-input" type="text"
+```
+
+方屏 `pages/ai/ai.hml` 与圆屏 `pages/round/ai/ai.hml` 同步修改（各 2 处）。
+
+- 两个视图常驻 vdom，`input` 在页面加载时即创建，不再「后创建」；
+- `text` 走标准文本输入通道，符合 Lite 支持列表。
+- 副作用：Key 输入时明文显示（Lite 无密码掩码）；已保存 Key 的展示仍是 `sk-***`。
+- 内存：两个视图同时常驻，多约 1 个 input + 若干 text，可忽略。
+
+### 4. 版本与产物
+
+- `versionCode 1104 / versionName 1.1.4`；平台沿用 v1.1.3 的 `compatible = target = 6.1.0(23)`。
+- HAP **329,784 B**（47 条目、0 PNG、0 `.bc`）/ SHA256 `84867AB1ED16580BC82F8726087BD00036B4FBBD75646E420833F57AFA32B25C`；APP **319,162 B** / SHA256 `959AFD53361A382B5418EFA67FF863FA2D23B7627BFA92FBD710F847439A66CC`。
+- 冒烟 147/147、`verify-build` 通过、两次构建哈希一致。
+- **真机确认**：2026-11-27 用户实测「测试完全正常，功能修复成功」。
+
+### 5. 可复用要点
+
+- **Lite 上凡是需要用户交互的原生组件（input 等），不要放在首帧为 `false` 的 `if` 分支里**；用 `show` 让它常驻 vdom，否则后构建的组件拿不到输入法拉起能力。
+- 内置默认值改变了 `enabled` 语义后，要复查依赖该字段做视图切换的逻辑——「功能入口变化」可能连带破坏组件初始化路径。
+- `input` 的 `type` 只能用 `button / checkbox / radio / text`；要输入必须 `text`。
+
 ## 六、待办（按优先级）
 
 > **2026-11-26 更新**：当前优先项已变为 **v1.1.1 GT 受限档真机回归 + FIT5 完整档 P2/P3 回归**（见五之四十第 8~9 条与 `交付-真机待验清单-v1.0.8-P2P3.md`）。以下 0~6 为 v1.0.3/v1.0.7 历史待办，除 bin 安装链路外多数已被后续版本覆盖，保留作背景。
