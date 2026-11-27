@@ -14,10 +14,13 @@
 - **v1.1.2 新增 RSS 新闻**：5 个公共 RSS 源，列表/频道/详情三视图，支持阅读原文。
 - 无 WebView，全部由 `@system.fetch` + 自研 HTML/RSS 解析 + 分页渲染实现。
 - 最终 HAP 为 **BIN-only**：页面图片和应用图标均为 `.bin`，安装包内 0 个 PNG（源文件开发阶段仍保留 PNG）。
+- 打包**不含 `.bc` 字节码**：运行时直接解析同名 `.js`，HAP 526,880 → 329,815 B（-37.4%），真机验证正常。
 
 ## 二、下载
 
 每个版本的**未签名 `.app`** 可在仓库的 [Releases](https://github.com/ydbeggar/LiteHarmonyBrowser/releases) 页面下载。由于 GitHub 不允许直接上传 `.app` 扩展名，附件以 zip 封装，文件名形如 `LiteHarmonyBrowser-v1.1.2-unsigned-final.app.zip`，解压后得到同名 `.app`。
+
+当前最新 v1.1.2（真机确认版）：解压后 `.app` 319,233 B，SHA256 `6590D43EE3E98362426ABBEDE8108F63831C0BBB4DBB78C2515C8DCDE30C8778`。
 
 未签名包需使用 DevEco Studio 配置本机签名后再安装或上架；仓库内 `dist/unsigned/` 同时保留了历史未签名 `.hap` / `.app`。
 
@@ -40,7 +43,7 @@ dist/                     历史构建产物（HAP/APP）
 pwsh -File tools\build.ps1
 ```
 
-流程：冒烟测试（147 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/` → `verify-build.ps1` 检查 0 PNG、双端页面齐全、页面 JS <112KB。
+流程：冒烟测试（147 条）→ hvigor release 构建 → `pack-app.ps1` 打包到 `dist/unsigned/`（默认剔除 `.bc` 字节码，`-KeepBytecode` 可保留）→ `verify-build.ps1` 检查 0 PNG、0 `.bc`、双端页面齐全、页面 JS <112KB。
 
 ## 五、Git 使用
 
